@@ -165,6 +165,7 @@ BuildRequires: xerces-j2
 BuildRequires: mercurial
 BuildRequires: ant
 BuildRequires: libxinerama-devel
+BuildRequires: zip
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 %else
