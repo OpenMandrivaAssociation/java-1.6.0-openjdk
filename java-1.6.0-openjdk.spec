@@ -153,7 +153,6 @@ BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
 BuildRequires: lesstif-devel
-BuildRequires: X11-devel
 BuildRequires: libxi-devel
 BuildRequires: libxp-devel
 BuildRequires: libxt-devel
