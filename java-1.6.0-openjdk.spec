@@ -3,17 +3,14 @@
 # java-1.6.0-openjdk-devel.
 %define gcjbootstrap 1
 
+%bcond_with mauve
+
 %define icedteaver 1.2
 %define icedteasnapshot -0bdd2917dfdb672402a7868206fd4ce9b2690a8c
 %define openjdkver b09
 %define openjdkdate 11_apr_2008
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
-
-%define accessmajorver 1.22
-%define accessminorver 0
-%define accessver %{accessmajorver}.%{accessminorver}
-%define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
@@ -118,7 +115,7 @@ Release: %mkrel 0.10.%{openjdkver}.1
 # satisfied by the 1:1.5.0 packages.  Thus we need to set the epoch in
 # JDK package >= 1.6.0 to 1, and packages referring to JDK virtual
 # provides >= 1.6.0 must specify the epoch, "java >= 1:1.6.0".
-Epoch:   1
+Epoch:   0
 Summary: OpenJDK Runtime Environment
 Group:   Development/Java
 
@@ -128,7 +125,6 @@ Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 Source1:  %{fedorazip}
 # Save icedtea.classpath.org space and bandwidth.
 # NoSource: 1
-Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  README.plugin
@@ -144,7 +140,8 @@ Patch1:   java-1.6.0-openjdk-makefile.patch
 # GPL Licenses.
 Patch2:   java-1.6.0-openjdk-jhat.patch
 Patch3:   java-1.6.0-openjdk-no-ht-support.patch
-Patch4:   java-1.6.0-openjdk-ljvm.patch
+Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
+Patch5:   java-1.6.0-openjdk-link-cpp.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -178,10 +175,8 @@ BuildRequires: x11-font-misc
 BuildRequires: freetype2-devel >= 2.3.0
 BuildRequires: fontconfig
 # Java Access Bridge for GNOME build requirements.
-BuildRequires: at-spi-devel
-BuildRequires: gawk
-BuildRequires: libbonobo-devel
-BuildRequires: pkgconfig >= 0.9.0
+Requires:      java-access-bridge
+BuildRequires: java-access-bridge
 # gcjwebplugin build requirements.
 BuildRequires: firefox-devel
 BuildRequires: glib2-devel
@@ -347,12 +342,11 @@ The OpenJDK web browser plugin.
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 1
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 6
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 2
 %patch0
 %patch1
 %patch3
 %patch4
-%{__sed} -i -e "s|\@GCJDIR\@|`gcj-dbtool%{gcc_version} -p | %{__sed} 's|/classmap\.db||'`|" openjdk/hotspot/build/linux/makefiles/launcher.make
+%patch5 -b .link-cpp
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
@@ -373,17 +367,13 @@ popd
 %endif
 make stamps/patch.stamp
 patch -l -p0 < %{PATCH2}
-make || (unset JAVACMD && make)
-pushd java-access-bridge-%{accessver}
-  export JAVA_HOME=$(pwd)/../%{buildoutputdir}/j2sdk-image
-  export PATH=$JAVA_HOME/bin:$PATH
-  %{configure2_5x}
-  %{make}
-  cp -a bridge/accessibility.properties $JAVA_HOME/jre/lib
-  cp -a gnome-java-bridge.jar $JAVA_HOME/jre/lib/ext
-popd
+make STATIC_CXX=false || (export JAVACMD= && make STATIC_CXX=false)
 touch mauve-%{mauvedate}/mauve_output
-%if 0
+pushd %{buildoutputdir}/j2sdk-image/jre/lib
+  %{__ln_s}f %{_javadir}/accessibility.properties accessibility.properties
+  %{__ln_s}f %{_javadir}/gnome-java-bridge.jar ext/gnome-java-bridge.jar
+popd
+%if %with mauve
 # Running Mauve to check for regressions
 pushd mauve-%{mauvedate}
   %{configure2_5x}
