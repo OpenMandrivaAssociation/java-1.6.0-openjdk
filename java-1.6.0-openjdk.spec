@@ -14,7 +14,7 @@
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
+%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-dfsg.tar.gz
 
 %define mauvedate 2008-03-11
 
@@ -132,6 +132,7 @@ Source6:  mauve-%{mauvedate}.tar.gz
 Source7:  mauve_tests
 Source8:  %{name}-jconsole.desktop
 Source9:  %{name}-policytool.desktop
+Source10: generate-dfsg-zip.sh
 # FIXME: This patch needs to be fixed. optflags argument -mtune=generic is being ignored
 # because it breaks several graphical applications.
 Patch0:   java-1.6.0-openjdk-optflags.patch
@@ -352,8 +353,7 @@ cp %{SOURCE5} .
 cp %{SOURCE7} .
 cp %{SOURCE8} jconsole.desktop
 cp %{SOURCE9} policytool.desktop
-%{__chmod} 0644 openjdk/jdk/src/share/lib/cmm/lcms/GRAY.pf
-%{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs -t %{__chmod} 0755
+%{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
 
 %build
 export CFLAGS="%{optflags} -fno-tree-vrp"
@@ -481,7 +481,7 @@ for s in 16 24 32 48 ; do
     $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
 done
 for e in jconsole policytool ; do
-    desktop-file-install --vendor=fedora --mode=644 \
+    desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
 done
 
