@@ -713,6 +713,7 @@ update-alternatives\
   --slave %{_jvmjardir}/java-%{javaver} \
   java_sdk_%{javaver}_exports %{_jvmjardir}/%{sdklnk}
 
+%update_menus
 exit 0
 
 %postun devel
@@ -723,6 +724,7 @@ then
   update-alternatives --remove java_sdk_%{javaver} %{_jvmdir}/%{sdklnk}
 fi
 
+%clean_menus
 exit 0
 
 %post javadoc
