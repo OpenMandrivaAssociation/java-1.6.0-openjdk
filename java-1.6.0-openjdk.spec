@@ -163,7 +163,6 @@ BuildRequires: png-devel
 BuildRequires: wget
 BuildRequires: xalan-j2
 BuildRequires: xerces-j2
-BuildRequires: mercurial
 BuildRequires: ant
 BuildRequires: libxinerama-devel
 BuildRequires: zip
