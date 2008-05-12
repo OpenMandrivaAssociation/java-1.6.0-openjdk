@@ -143,6 +143,8 @@ Patch2:   java-1.6.0-openjdk-jhat.patch
 Patch3:   java-1.6.0-openjdk-no-ht-support.patch
 Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
 Patch5:   java-1.6.0-openjdk-link-cpp.patch
+# (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
+Patch6:   icedtea6-1.2-javaws-desktop.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -348,6 +350,7 @@ The OpenJDK web browser plugin.
 %patch3
 %patch4
 %patch5 -b .link-cpp
+%patch6 -p1
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
@@ -488,6 +491,7 @@ done
 # Install javaws desktop file.
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
 cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
+sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
 desktop-file-install \
   --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
 
