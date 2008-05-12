@@ -531,6 +531,9 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
   | sed 's|^|%doc |' \
   >> %{name}-demo.files
 
+# (Anssi 05/2008) for update-alternatives:
+install -d -m755 %{buildroot}%{_libdir}/mozilla/plugins
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -865,5 +868,7 @@ exit 0
 %files plugin
 %defattr(-,root,root,-)
 %doc README.plugin
+%dir %{_libdir}/mozilla
+%dir %{_libdir}/mozilla/plugins
 %{_jvmdir}/%{jredir}/lib/%{archinstall}/gcjwebplugin.so
 
