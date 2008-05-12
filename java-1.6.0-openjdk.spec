@@ -593,12 +593,9 @@ update-alternatives\
   %{_jvmprivdir}/%{archname}/jce/vanilla/US_export_policy.jar
 
 # Update for jnlp handling.
-update-desktop-database -q %{_datadir}/applications || :
-
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
-  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor
-fi
+%update_desktop_database
+%update_icon_cache hicolor
+%update_menus
 
 exit 0
 
@@ -614,12 +611,9 @@ then
 fi
 
 # Update for jnlp handling.
-update-desktop-database -q %{_datadir}/applications || :
-
-touch --no-create %{_datadir}/icons/hicolor
-if [ -x %{_bindir}/gtk-update-icon-cache ] ; then
-  %{_bindir}/gtk-update-icon-cache --quiet %{_datadir}/icons/hicolor
-fi
+%clean_desktop_database
+%clean_icon_cache hicolor
+%clean_menus
 
 exit 0
 
