@@ -208,11 +208,9 @@ Requires(post):   desktop-file-utils
 # for jnlp files.
 Requires(postun): desktop-file-utils
 
-%if 0
 # java-1.6.0-openjdk replaces java-1.7.0-icedtea
-Provides: java-1.7.0-icedtea = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
 
 # Standard JPackage base provides.
 Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
@@ -248,11 +246,9 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
 
-%if 0
 # java-1.6.0-openjdk-devel replaces java-1.7.0-icedtea-devel
-Provides: java-1.7.0-icedtea-devel = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea-devel < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea-devel = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea-devel < 0:1.7.0.0-24.726.2
 
 # Standard JPackage devel provides.
 Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
@@ -272,11 +268,9 @@ Group:   Development/Java
 
 Requires: %{name} = %{epoch}:%{version}-%{release}
 
-%if 0
 # java-1.6.0-openjdk-demo replaces java-1.7.0-icedtea-demo
-Provides: java-1.7.0-icedtea-demo = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea-demo < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea-demo = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea-demo < 0:1.7.0.0-24.726.2
 
 %description demo
 The OpenJDK demos.
@@ -287,11 +281,9 @@ Group:   Development/Java
 
 Requires: %{name} = %{epoch}:%{version}-%{release}
 
-%if 0
 # java-1.6.0-openjdk-src replaces java-1.7.0-icedtea-src
-Provides: java-1.7.0-icedtea-src = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea-src < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea-src = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea-src < 0:1.7.0.0-24.726.2
 
 %description src
 The OpenJDK source bundle.
@@ -305,11 +297,9 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall javadoc alternative.
 Requires(postun): update-alternatives
 
-%if 0
 # java-1.6.0-openjdk-javadoc replaces java-1.7.0-icedtea-javadoc
-Provides: java-1.7.0-icedtea-javadoc = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea-javadoc < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea-javadoc = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea-javadoc < 0:1.7.0.0-24.726.2
 
 # Standard JPackage javadoc provides.
 Provides: java-javadoc = %{epoch}:%{version}-%{release}
@@ -329,11 +319,9 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall plugin alternative.
 Requires(postun): update-alternatives
 
-%if 0
 # java-1.6.0-openjdk-plugin replaces java-1.7.0-icedtea-plugin
-Provides: java-1.7.0-icedtea-plugin = 0:1.7.0.0-0.999
-Obsoletes: java-1.7.0-icedtea-plugin < 0:1.7.0.0-0.999
-%endif
+Provides: java-1.7.0-icedtea-plugin = 0:1.7.0.0-24.726.2
+Obsoletes: java-1.7.0-icedtea-plugin < 0:1.7.0.0-24.726.2
 
 # Standard JPackage plugin provides.
 Provides: java-plugin = %{javaver}
