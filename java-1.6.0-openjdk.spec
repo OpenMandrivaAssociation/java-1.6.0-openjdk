@@ -605,10 +605,10 @@ exit 0
 %postun
 if ! [ -e %{jrebindir}/java ]
 then
-  update-alternatives--remove java %{jrebindir}/java
-  update-alternatives--remove jre_%{origin} %{_jvmdir}/%{jrelnk}
-  update-alternatives--remove jre_%{javaver} %{_jvmdir}/%{jrelnk}
-  update-alternatives--remove \
+  update-alternatives --remove java %{jrebindir}/java
+  update-alternatives --remove jre_%{origin} %{_jvmdir}/%{jrelnk}
+  update-alternatives --remove jre_%{javaver} %{_jvmdir}/%{jrelnk}
+  update-alternatives --remove \
     %{localpolicy} \
     %{_jvmprivdir}/%{archname}/jce/vanilla/local_policy.jar
 fi
@@ -724,9 +724,9 @@ exit 0
 %postun devel
 if ! [ -e %{sdkbindir}/javac ]
 then
-  update-alternatives--remove javac %{sdkbindir}/javac
-  update-alternatives--remove java_sdk_%{origin} %{_jvmdir}/%{sdklnk}
-  update-alternatives--remove java_sdk_%{javaver} %{_jvmdir}/%{sdklnk}
+  update-alternatives --remove javac %{sdkbindir}/javac
+  update-alternatives --remove java_sdk_%{origin} %{_jvmdir}/%{sdklnk}
+  update-alternatives --remove java_sdk_%{javaver} %{_jvmdir}/%{sdklnk}
 fi
 
 exit 0
@@ -741,7 +741,7 @@ exit 0
 %postun javadoc
 if [ $1 -eq 0 ]
 then
-  update-alternatives--remove javadocdir %{_javadocdir}/%{name}/api
+  update-alternatives --remove javadocdir %{_javadocdir}/%{name}/api
 fi
 
 exit 0
@@ -756,7 +756,7 @@ exit 0
 %postun plugin
 if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so ]
 then
-  update-alternatives--remove %{javaplugin} \
+  update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
 fi
 
