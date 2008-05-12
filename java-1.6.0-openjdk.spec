@@ -115,6 +115,7 @@ Release: %mkrel 0.10.%{openjdkver}.1
 # satisfied by the 1:1.5.0 packages.  Thus we need to set the epoch in
 # JDK package >= 1.6.0 to 1, and packages referring to JDK virtual
 # provides >= 1.6.0 must specify the epoch, "java >= 1:1.6.0".
+# ... but that doesn't apply to Mandriva.
 Epoch:   0
 Summary: OpenJDK Runtime Environment
 Group:   Development/Java
