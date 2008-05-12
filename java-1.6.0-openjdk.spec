@@ -603,7 +603,7 @@ fi
 exit 0
 
 %postun
-if [ $1 -eq 0 ]
+if ! [ -e %{jrebindir}/java ]
 then
   update-alternatives--remove java %{jrebindir}/java
   update-alternatives--remove jre_%{origin} %{_jvmdir}/%{jrelnk}
@@ -722,7 +722,7 @@ update-alternatives\
 exit 0
 
 %postun devel
-if [ $1 -eq 0 ]
+if ! [ -e %{sdkbindir}/javac ]
 then
   update-alternatives--remove javac %{sdkbindir}/javac
   update-alternatives--remove java_sdk_%{origin} %{_jvmdir}/%{sdklnk}
@@ -754,7 +754,7 @@ update-alternatives\
 exit 0
 
 %postun plugin
-if [ $1 -eq 0 ]
+if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so ]
 then
   update-alternatives--remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
