@@ -588,9 +588,11 @@ update-alternatives\
   %{_jvmprivdir}/%{archname}/jce/vanilla/US_export_policy.jar
 
 # Update for jnlp handling.
+%if %mdkversion < 200900
 %update_desktop_database
 %update_icon_cache hicolor
 %update_menus
+%endif
 
 exit 0
 
@@ -606,9 +608,11 @@ then
 fi
 
 # Update for jnlp handling.
+%if %mdkversion < 200900
 %clean_desktop_database
 %clean_icon_cache hicolor
 %clean_menus
+%endif
 
 exit 0
 
@@ -708,7 +712,9 @@ update-alternatives\
   --slave %{_jvmjardir}/java-%{javaver} \
   java_sdk_%{javaver}_exports %{_jvmjardir}/%{sdklnk}
 
+%if %mdkversion < 200900
 %update_menus
+%endif
 exit 0
 
 %postun devel
@@ -719,7 +725,9 @@ then
   update-alternatives --remove java_sdk_%{javaver} %{_jvmdir}/%{sdklnk}
 fi
 
+%if %mdkversion < 200900
 %clean_menus
+%endif
 exit 0
 
 %post javadoc
