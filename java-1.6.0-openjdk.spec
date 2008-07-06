@@ -5,8 +5,11 @@
 
 %bcond_with mauve
 
+# If runtests is 0 test suites will not be run.
+%define runtests 1
+
 %define icedteaver 1.2
-%define icedteasnapshot -0bdd2917dfdb672402a7868206fd4ce9b2690a8c
+%define icedteasnapshot %{nil}
 %define openjdkver b09
 %define openjdkdate 11_apr_2008
 
@@ -18,27 +21,27 @@
 
 %define mauvedate 2008-03-11
 
-%ifarch x86_64
-%define archbuild amd64
-%define archinstall amd64
-%else
-%ifarch ppc
-%define archbuild ppc
-%define archinstall ppc
-%else
-%ifarch ppc64
-%define archbuild ppc64
-%define archinstall ppc64
-%else
+%define multilib_arches ppc64 sparc64 x86_64
+
+%define jit_arches %{ix86} x86_64
+
 %ifarch %{ix86}
 %define archbuild i586
 %define archinstall i386
-%else
-%define archbuild zero
-%define archinstall zero
 %endif
+%ifarch x86_64
+%define archbuild amd64
+%define archinstall amd64
 %endif
+%ifnarch %{jit_arches}
+%define archbuild %{_arch}
+%define archinstall %{_arch}
 %endif
+
+# Reduce build time from 27 hours to 12 hours by only running test
+# suites on JIT architectures.
+%ifnarch %{jit_arches}
+%define runtests 0
 %endif
 
 %define buildoutputdir openjdk/control/build/linux-%{archbuild}
@@ -59,7 +62,7 @@
 
 # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
 # simply be another alternative.
-%ifarch x86_64 ppc64 sparc64
+%ifarch %{multilib_arches}
 %define syslibdir       %{_prefix}/lib64
 %define _libdir         %{_prefix}/lib
 %define archname        %{name}.%{_arch}
@@ -82,7 +85,7 @@
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
-%ifarch x86_64 ppc64 sparc64
+%ifarch %{multilib_arches}
 %define sdklnk          java-%{javaver}-%{origin}.%{_arch}
 %define jrelnk          jre-%{javaver}-%{origin}.%{_arch}
 %define sdkdir          %{name}-%{version}.%{_arch}
@@ -94,7 +97,7 @@
 %define jredir          %{sdkdir}/jre
 %define sdkbindir       %{_jvmdir}/%{sdklnk}/bin
 %define jrebindir       %{_jvmdir}/%{jrelnk}/bin
-%ifarch x86_64 ppc64 sparc64
+%ifarch %{multilib_arches}
 %define jvmjardir       %{_jvmjardir}/%{name}-%{version}.%{_arch}
 %else
 %define jvmjardir       %{_jvmjardir}/%{name}-%{version}
@@ -105,7 +108,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.10.%{openjdkver}.2
+Release: %mkrel 0.16.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -124,28 +127,26 @@ License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 Source1:  %{fedorazip}
-# Save icedtea.classpath.org space and bandwidth.
-# NoSource: 1
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  README.plugin
 Source6:  mauve-%{mauvedate}.tar.gz
 Source7:  mauve_tests
-Source8:  %{name}-jconsole.desktop
-Source9:  %{name}-policytool.desktop
 Source10: generate-dfsg-zip.sh
-# FIXME: This patch needs to be fixed. optflags argument -mtune=generic is being ignored
-# because it breaks several graphical applications.
+# FIXME: This patch needs to be fixed. optflags argument
+# -mtune=generic is being ignored because it breaks several graphical
+# applications.
 Patch0:   java-1.6.0-openjdk-optflags.patch
-Patch1:   java-1.6.0-openjdk-makefile.patch
-# FIXME: The licenses in the jhat sources need to be fixed with proper 
-# GPL Licenses.
-Patch2:   java-1.6.0-openjdk-jhat.patch
+# Non-Fedora patches:
 Patch3:   java-1.6.0-openjdk-no-ht-support.patch
 Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
 Patch5:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch6:   icedtea6-1.2-javaws-desktop.patch
+# (Anssi 07/2008) Fixes build:
+Patch7:   openjdk-do-not-redefine-bcopy-bcmp-bzero.patch
+# (Anssi 07/2008) Fixes build (without static libstdc++):
+Patch8:   java-1.6.0-openjdk-link-cpp2.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -177,6 +178,7 @@ BuildRequires: x11-font-type1
 BuildRequires: x11-font-misc
 BuildRequires: freetype2-devel >= 2.3.0
 BuildRequires: fontconfig
+BuildRequires: eclipse-ecj
 # Java Access Bridge for GNOME build requirements.
 Requires:      java-access-bridge
 BuildRequires: java-access-bridge
@@ -184,15 +186,14 @@ BuildRequires: java-access-bridge
 BuildRequires: firefox-devel
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
-# Zero-assembler build requirement
-%ifnarch x86_64 %{ix86}
+# Zero-assembler build requirement.
+%ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
 
-# Require /etc/pki/tls/certs/ca-bundle.crt instead of generating
-# cacerts.
-Requires: openssl
-# Require jpackage-utils for ant
+# Require /etc/pki/java/cacerts.
+Requires: rootcerts-java
+# Require jpackage-utils for ant.
 Requires: jpackage-utils >= 1.7.3-1jpp.3
 # Require zoneinfo data provided by tzdata-java subpackage.
 Requires: tzdata-java
@@ -207,7 +208,7 @@ Requires(post):   desktop-file-utils
 # for jnlp files.
 Requires(postun): desktop-file-utils
 
-# java-1.6.0-openjdk replaces java-1.7.0-icedtea
+# java-1.6.0-openjdk replaces java-1.7.0-icedtea.
 Provides: java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
 
@@ -245,7 +246,7 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
 
-# java-1.6.0-openjdk-devel replaces java-1.7.0-icedtea-devel
+# java-1.6.0-openjdk-devel replaces java-1.7.0-icedtea-devel.
 Provides: java-1.7.0-icedtea-devel = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-devel < 0:1.7.0.0-24.726.2
 
@@ -267,7 +268,7 @@ Group:   Development/Java
 
 Requires: %{name} = %{epoch}:%{version}-%{release}
 
-# java-1.6.0-openjdk-demo replaces java-1.7.0-icedtea-demo
+# java-1.6.0-openjdk-demo replaces java-1.7.0-icedtea-demo.
 Provides: java-1.7.0-icedtea-demo = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-demo < 0:1.7.0.0-24.726.2
 
@@ -280,7 +281,7 @@ Group:   Development/Java
 
 Requires: %{name} = %{epoch}:%{version}-%{release}
 
-# java-1.6.0-openjdk-src replaces java-1.7.0-icedtea-src
+# java-1.6.0-openjdk-src replaces java-1.7.0-icedtea-src.
 Provides: java-1.7.0-icedtea-src = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-src < 0:1.7.0.0-24.726.2
 
@@ -296,7 +297,7 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall javadoc alternative.
 Requires(postun): update-alternatives
 
-# java-1.6.0-openjdk-javadoc replaces java-1.7.0-icedtea-javadoc
+# java-1.6.0-openjdk-javadoc replaces java-1.7.0-icedtea-javadoc.
 Provides: java-1.7.0-icedtea-javadoc = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-javadoc < 0:1.7.0.0-24.726.2
 
@@ -318,7 +319,7 @@ Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall plugin alternative.
 Requires(postun): update-alternatives
 
-# java-1.6.0-openjdk-plugin replaces java-1.7.0-icedtea-plugin
+# java-1.6.0-openjdk-plugin replaces java-1.7.0-icedtea-plugin.
 Provides: java-1.7.0-icedtea-plugin = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-plugin < 0:1.7.0.0-24.726.2
 
@@ -330,42 +331,55 @@ Provides: java-%{javaver}-plugin = %{epoch}:%{version}
 The OpenJDK web browser plugin.
 
 %prep
-%setup -q -n icedtea6-%{icedteaver}
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 1
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 6
+%setup -q -n icedtea6-%{icedteaver} -a 1 -a 6
 %patch0
-%patch1
 %patch3
 %patch4
 %patch5 -b .link-cpp
 %patch6 -p1
+%patch7
+%patch8 -p1
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
-cp %{SOURCE8} jconsole.desktop
-cp %{SOURCE9} policytool.desktop
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
 
 %build
-export CFLAGS="%{optflags} -fno-tree-vrp"
-%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1}
+# Build IcedTea and OpenJDK.
+# (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
+export ALT_COMPILER_PATH=
+%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --with-libgcj-jar=%{_jvmdir}/jre-gcj/lib/rt.jar
 %if %{gcjbootstrap}
-export JAVACMD="%{_jvmdir}/java-gcj/bin/java"
 make stamps/patch-ecj.stamp
-pushd openjdk-ecj
-  patch -l -p1 < %{PATCH2}
-popd
 %endif
 make stamps/patch.stamp
-patch -l -p0 < %{PATCH2}
-make STATIC_CXX=false || (export JAVACMD= && make STATIC_CXX=false)
+make
+
+export JAVA_HOME=$(pwd)/%{buildoutputdir}/j2sdk-image
+
 touch mauve-%{mauvedate}/mauve_output
 pushd %{buildoutputdir}/j2sdk-image/jre/lib
   %{__ln_s}f %{_javadir}/accessibility.properties accessibility.properties
   %{__ln_s}f %{_javadir}/gnome-java-bridge.jar ext/gnome-java-bridge.jar
 popd
+
+%if %{runtests}
+# Run jtreg test suite.
+{
+  echo ====================JTREG TESTING========================
+  export DISPLAY=:20
+  Xvfb :20 -screen 0 1x1x24 -ac&
+  echo $! > Xvfb.pid
+  make jtregcheck -k | tee jtreg_output
+  kill -9 `cat Xvfb.pid`
+  unset DISPLAY
+  rm -f Xvfb.pid
+  echo ====================JTREG TESTING END====================
+} || :
+
 %if %with mauve
-# Running Mauve to check for regressions
+# Run Mauve test suite.
+{
 pushd mauve-%{mauvedate}
   %{configure2_5x}
   %{make}
@@ -373,14 +387,15 @@ pushd mauve-%{mauvedate}
   export DISPLAY=:20
   Xvfb :20 -screen 0 1x1x24 -ac& 
   echo $! > Xvfb.pid
-  ( $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
-  -file %{SOURCE7} \
-  -timeout 30000 2>&1 | tee mauve_output ) || :
+  $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
+      -file %{SOURCE7} -timeout 30000 2>&1 | tee mauve_output
   kill -9 `cat Xvfb.pid`
   unset DISPLAY
   rm -f Xvfb.pid
   echo ====================MAUVE TESTING END====================
 popd
+} || :
+%endif
 %endif
 
 %install
@@ -393,6 +408,14 @@ pushd %{buildoutputdir}/j2sdk-image
   cp -a bin include lib src.zip $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
   install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
   cp -a jre/bin jre/lib $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
+
+  # Install cacerts symlink.
+  rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
+  pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security
+    RELATIVE=$(%{abs2rel} %{_sysconfdir}/pki/java \
+      %{_jvmdir}/%{jredir}/lib/security)
+    ln -sf $RELATIVE/cacerts .
+  popd
 
   # Install extension symlinks.
   install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
@@ -465,23 +488,23 @@ popd
 install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}
 cp -a %{buildoutputdir}/docs $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
-# Install icons and menu entries
+# Install icons and menu entries.
 for s in 16 24 32 48 ; do
   install -D -p -m 644 \
     openjdk/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
     $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
 done
+# Install desktop files.
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
+cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
+# (Anssi 07/2008) Mandriva patch:
+sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
+desktop-file-install \
+  --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
 done
-
-# Install javaws desktop file.
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
-cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
-sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
-desktop-file-install \
-  --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
 
 # Find JRE directories.
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
@@ -525,7 +548,7 @@ install -d -m755 %{buildroot}%{_libdir}/mozilla/plugins
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-# FIXME: identical binaries are copied, not linked. This needs to be 
+# FIXME: identical binaries are copied, not linked. This needs to be
 # fixed upstream.
 %post
 ext=%{_extension}
@@ -632,6 +655,7 @@ update-alternatives\
   --slave %{_bindir}/javap javap %{sdkbindir}/javap \
   --slave %{_bindir}/jconsole jconsole %{sdkbindir}/jconsole \
   --slave %{_bindir}/jdb jdb %{sdkbindir}/jdb \
+  --slave %{_bindir}/jhat jhat %{sdkbindir}/jhat \
   --slave %{_bindir}/jinfo jinfo %{sdkbindir}/jinfo \
   --slave %{_bindir}/jmap jmap %{sdkbindir}/jmap \
   --slave %{_bindir}/jps jps %{sdkbindir}/jps \
@@ -669,6 +693,8 @@ update-alternatives\
   %{_mandir}/man1/jconsole-%{name}.1$ext \
   --slave %{_mandir}/man1/jdb.1$ext jdb.1$ext \
   %{_mandir}/man1/jdb-%{name}.1$ext \
+  --slave %{_mandir}/man1/jhat.1$ext jhat.1$ext \
+  %{_mandir}/man1/jhat-%{name}.1$ext \
   --slave %{_mandir}/man1/jinfo.1$ext jinfo.1$ext \
   %{_mandir}/man1/jinfo-%{name}.1$ext \
   --slave %{_mandir}/man1/jmap.1$ext jmap.1$ext \
@@ -780,8 +806,8 @@ exit 0
 %{_jvmprivdir}/*
 %{jvmjardir}
 %dir %{_jvmdir}/%{jredir}/lib/security
-#FIXME: These should be replaced by symlinks into /etc.
-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/cacerts
+%{_jvmdir}/%{jredir}/lib/security/cacerts
+# FIXME: These should be replaced by symlinks into /etc.
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
@@ -854,8 +880,12 @@ exit 0
 %defattr(-,root,root,-)
 %doc README.src
 %{_jvmdir}/%{sdkdir}/src.zip
+%if %{runtests}
+# FIXME: put these in a separate testresults subpackage.
 %doc mauve_tests
 %doc mauve-%{mauvedate}/mauve_output
+%doc jtreg_output
+%endif
 
 %files javadoc
 %defattr(-,root,root,-)
