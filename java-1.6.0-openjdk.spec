@@ -147,7 +147,8 @@ Patch6:   icedtea6-1.2-javaws-desktop.patch
 Patch7:   openjdk-do-not-redefine-bcopy-bcmp-bzero.patch
 # (Anssi 07/2008) Fixes build (without static libstdc++):
 Patch8:   java-1.6.0-openjdk-link-cpp2.patch
-
+# (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
+Patch9:   icedtea6-1.2-policytool-desktop.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -339,6 +340,7 @@ The OpenJDK web browser plugin.
 %patch6 -p1
 %patch7
 %patch8 -p1
+%patch9 -p0
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
