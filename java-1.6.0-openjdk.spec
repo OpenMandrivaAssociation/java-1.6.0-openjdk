@@ -1,23 +1,20 @@
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 1
+%define gcjbootstrap 0
 
-%bcond_with mauve
-
-# If runtests is 0 test suites will not be run.
-%define runtests 1
+%define runtests 0
 
 %define icedteaver 1.2
 %define icedteasnapshot %{nil}
-%define openjdkver b09
-%define openjdkdate 11_apr_2008
+%define openjdkver b11
+%define openjdkdate 10_jul_2008
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
-%define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
+%define openjdkurlbase http://www.java.net/download/openjdk/jdk6/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-dfsg.tar.gz
+%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-dfsg.tar.bz2
 
 %define mauvedate 2008-03-11
 
@@ -47,7 +44,7 @@
 %define buildoutputdir openjdk/control/build/linux-%{archbuild}
 
 %if %{gcjbootstrap}
-%define icedteaopt --with-java=%{_jvmdir}/java-gcj/bin/java --with-ecj=%{_jvmdir}/java-gcj/bin/javac --with-javah=%{_jvmdir}/java-gcj/bin/javah --with-jar=%{_jvmdir}/java-gcj/bin/jar --with-rmic=%{_jvmdir}/java-gcj/bin/rmic --with-libgcj-jar=%{_javadir}/libgcj-%{gcc_version}.jar
+%define icedteaopt --with-java=%{_jvmdir}/java-gcj/bin/java --with-ecj=%{_jvmdir}/java-gcj/bin/javac --with-javah=%{_jvmdir}/java-gcj/bin/javah --with-jar=%{_jvmdir}/java-gcj/bin/jar --with-rmic=%{_jvmdir}/java-gcj/bin/rmic --with-libgcj-jar=%{_jvmdir}/jre-gcj/lib/rt.jar
 %define gcc_version 4.3
 %else
 %define icedteaopt --with-openjdk
@@ -125,7 +122,11 @@ Group:   Development/Java
 
 License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
-Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+#Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+# hg clone http://icedtea.classpath.org/hg/icedtea6
+# rm -r icedtea6/.hg
+# tar cvjf icedtea6.tar.bz2 icedtea6
+Source0:  %{url}download/source/icedtea6.tar.bz2
 Source1:  %{fedorazip}
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
@@ -136,10 +137,14 @@ Source10: generate-dfsg-zip.sh
 # FIXME: This patch needs to be fixed. optflags argument
 # -mtune=generic is being ignored because it breaks several graphical
 # applications.
+# (wallluck): Fixed to patch configure.ac, not configure
 Patch0:   java-1.6.0-openjdk-optflags.patch
+# (walluck): Avoid crash when ht support is enabled
 # Non-Fedora patches:
 Patch3:   java-1.6.0-openjdk-no-ht-support.patch
+# (walluck): Work around a kernel issues with long argument lists
 Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
+# (walluck): Correctly use g++ and dynamic linking
 Patch5:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch6:   icedtea6-1.2-javaws-desktop.patch
@@ -149,6 +154,8 @@ Patch7:   openjdk-do-not-redefine-bcopy-bcmp-bzero.patch
 Patch8:   java-1.6.0-openjdk-link-cpp2.patch
 # (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
 Patch9:   icedtea6-1.2-policytool-desktop.patch
+# (walluck): Fix icedtea-shark-build.patch
+Patch10:   icedtea6-shark-build.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -162,6 +169,7 @@ BuildRequires: libxt-devel
 BuildRequires: libxtst-devel
 BuildRequires: jpeg-devel
 BuildRequires: png-devel
+BuildRequires: rhino
 BuildRequires: wget
 BuildRequires: xalan-j2
 BuildRequires: xerces-j2
@@ -183,17 +191,20 @@ BuildRequires: eclipse-ecj
 # Java Access Bridge for GNOME build requirements.
 Requires:      java-access-bridge
 BuildRequires: java-access-bridge
-# gcjwebplugin build requirements.
+# IcedTeaPlugin build requirements.
 BuildRequires: firefox-devel
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
+# liveconnect build requirements.
+BuildRequires: libxulrunner-devel-unstable
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
 
-# Require /etc/pki/java/cacerts.
-Requires: rootcerts-java
+# Require /etc/pki/tls/certs/ca-bundle.crt instead of generating
+# cacerts.
+Requires: rootcerts
 # Require jpackage-utils for ant.
 Requires: jpackage-utils >= 1.7.3-1jpp.3
 # Require zoneinfo data provided by tzdata-java subpackage.
@@ -332,15 +343,22 @@ Provides: java-%{javaver}-plugin = %{epoch}:%{version}
 The OpenJDK web browser plugin.
 
 %prep
-%setup -q -n icedtea6-%{icedteaver} -a 1 -a 6
+#%%setup -q -n icedtea6-%{icedteaver}
+#%%setup -q -n icedtea6-%{icedteaver} -T -D -a 1
+#%%setup -q -n icedtea6-%{icedteaver} -T -D -a 6
+%setup -q -n icedtea6
+%setup -q -n icedtea6 -T -D -a 1
+%setup -q -n icedtea6 -T -D -a 6
+%{_bindir}/autoreconf -i -v -f
 %patch0
 %patch3
 %patch4
-%patch5 -b .link-cpp
+%patch5
 %patch6 -p1
 %patch7
 %patch8 -p1
 %patch9 -p0
+%patch10
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
@@ -350,21 +368,19 @@ cp %{SOURCE7} .
 # Build IcedTea and OpenJDK.
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
-%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --with-libgcj-jar=%{_jvmdir}/jre-gcj/lib/rt.jar
+export CFLAGS="%{optflags} -fno-tree-vrp"
+%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --enable-liveconnect
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
 make stamps/patch.stamp
 make
 
-export JAVA_HOME=$(pwd)/%{buildoutputdir}/j2sdk-image
-
 touch mauve-%{mauvedate}/mauve_output
 pushd %{buildoutputdir}/j2sdk-image/jre/lib
   %{__ln_s}f %{_javadir}/accessibility.properties accessibility.properties
   %{__ln_s}f %{_javadir}/gnome-java-bridge.jar ext/gnome-java-bridge.jar
 popd
-
 %if %{runtests}
 # Run jtreg test suite.
 {
@@ -379,25 +395,23 @@ popd
   echo ====================JTREG TESTING END====================
 } || :
 
-%if %with mauve
 # Run Mauve test suite.
 {
-pushd mauve-%{mauvedate}
-  %{configure2_5x}
-  %{make}
-  echo ====================MAUVE TESTING========================
-  export DISPLAY=:20
-  Xvfb :20 -screen 0 1x1x24 -ac& 
-  echo $! > Xvfb.pid
-  $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
+  pushd mauve-%{mauvedate}
+    %{configure2_5x}
+    make
+    echo ====================MAUVE TESTING========================
+    export DISPLAY=:20
+    Xvfb :20 -screen 0 1x1x24 -ac&
+    echo $! > Xvfb.pid
+    $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
       -file %{SOURCE7} -timeout 30000 2>&1 | tee mauve_output
-  kill -9 `cat Xvfb.pid`
-  unset DISPLAY
-  rm -f Xvfb.pid
-  echo ====================MAUVE TESTING END====================
-popd
+    kill -9 `cat Xvfb.pid`
+    unset DISPLAY
+    rm -f Xvfb.pid
+    echo ====================MAUVE TESTING END====================
+  popd
 } || :
-%endif
 %endif
 
 %install
@@ -481,7 +495,8 @@ pushd %{buildoutputdir}/j2sdk-image
   # Install demos and samples.
   cp -a demo $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
   mkdir -p sample/rmi
-  mv bin/java-rmi.cgi sample/rmi
+  # XXX: (walluck): fix -ba --short-circuit
+  test -f bin/sample.cgi && mv bin/java-rmi.cgi sample/rmi
   cp -a sample $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
 
 popd
@@ -496,6 +511,7 @@ for s in 16 24 32 48 ; do
     openjdk/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
     $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
 done
+
 # Install desktop files.
 install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
 cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
@@ -517,6 +533,7 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
   | grep -v gcjwebplugin.so \
+  | grep -v IcedTeaPlugin.so \
   | sed 's|'$RPM_BUILD_ROOT'||' \
   >> %{name}.files
 # Find demo directories.
@@ -774,19 +791,31 @@ fi
 exit 0
 
 %post plugin
+%if 0
 update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
   %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so %{priority}
-
+%else
+update-alternatives\
+  --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
+  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
+%endif
 exit 0
 
 %postun plugin
+%if 0
 if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so ]
 then
   update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
 fi
-
+%else
+if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so ]
+then
+  update-alternatives --remove %{javaplugin} \
+    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
+fi
+%endif
 exit 0
 
 %files -f %{name}.files
@@ -808,8 +837,8 @@ exit 0
 %{_jvmprivdir}/*
 %{jvmjardir}
 %dir %{_jvmdir}/%{jredir}/lib/security
-%{_jvmdir}/%{jredir}/lib/security/cacerts
 # FIXME: These should be replaced by symlinks into /etc.
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
@@ -898,5 +927,8 @@ exit 0
 %doc README.plugin
 %dir %{_libdir}/mozilla
 %dir %{_libdir}/mozilla/plugins
+%if 0
 %{_jvmdir}/%{jredir}/lib/%{archinstall}/gcjwebplugin.so
-
+%else
+%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
+%endif
