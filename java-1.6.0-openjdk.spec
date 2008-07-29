@@ -196,7 +196,7 @@ BuildRequires: firefox-devel
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
 # liveconnect build requirements.
-BuildRequires: libxulrunner-devel-unstable
+BuildRequires: xulrunner-devel-unstable
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
