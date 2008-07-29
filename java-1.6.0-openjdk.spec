@@ -148,8 +148,6 @@ Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
 Patch5:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch6:   icedtea6-1.2-javaws-desktop.patch
-# (Anssi 07/2008) Fixes build:
-Patch7:   openjdk-do-not-redefine-bcopy-bcmp-bzero.patch
 # (Anssi 07/2008) Fixes build (without static libstdc++):
 Patch8:   java-1.6.0-openjdk-link-cpp2.patch
 # (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
@@ -355,7 +353,6 @@ The OpenJDK web browser plugin.
 %patch4
 %patch5
 %patch6 -p1
-%patch7
 %patch8 -p1
 %patch9 -p0
 %patch10
