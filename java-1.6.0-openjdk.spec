@@ -149,7 +149,7 @@ Patch5:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch6:   icedtea6-1.2-javaws-desktop.patch
 # (Anssi 07/2008) Fixes build (without static libstdc++):
-Patch8:   java-1.6.0-openjdk-link-cpp2.patch
+#Patch8:   java-1.6.0-openjdk-link-cpp2.patch
 # (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
 Patch9:   icedtea6-1.2-policytool-desktop.patch
 # (walluck): Fix icedtea-shark-build.patch
@@ -353,7 +353,7 @@ The OpenJDK web browser plugin.
 %patch4
 %patch5
 %patch6 -p1
-%patch8 -p1
+#%patch8 -p1
 %patch9 -p0
 %patch10
 cp %{SOURCE4} .
@@ -371,7 +371,7 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 make stamps/patch-ecj.stamp
 %endif
 make stamps/patch.stamp
-make
+make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
 pushd %{buildoutputdir}/j2sdk-image/jre/lib
