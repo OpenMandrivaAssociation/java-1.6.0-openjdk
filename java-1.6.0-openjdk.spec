@@ -190,10 +190,8 @@ BuildRequires: eclipse-ecj
 Requires:      java-access-bridge
 BuildRequires: java-access-bridge
 # IcedTeaPlugin build requirements.
-BuildRequires: firefox-devel
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
-# liveconnect build requirements.
 BuildRequires: xulrunner-devel-unstable
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
