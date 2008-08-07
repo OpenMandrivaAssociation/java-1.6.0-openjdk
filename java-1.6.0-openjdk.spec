@@ -105,7 +105,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 2.16.%{openjdkver}.1
+Release: %mkrel 0.16.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -124,8 +124,8 @@ License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 #Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 # hg clone http://icedtea.classpath.org/hg/icedtea6
-# rm -r icedtea6/.hg
-# tar cvjf icedtea6.tar.bz2 icedtea6
+# rm -rf icedtea6/.hg
+# tar cjf icedtea6.tar.bz2 icedtea6
 Source0:  %{url}download/source/icedtea6.tar.bz2
 Source1:  %{fedorazip}
 Source3:  %{genurl}generate-fedora-zip.sh
