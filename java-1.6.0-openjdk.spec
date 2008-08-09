@@ -105,7 +105,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.16.%{openjdkver}.1
+Release: %mkrel 0.16.%{openjdkver}.2
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -200,9 +200,8 @@ BuildRequires: xulrunner-devel-unstable
 BuildRequires: libffi-devel
 %endif
 
-# Require /etc/pki/tls/certs/ca-bundle.crt instead of generating
-# cacerts.
-Requires: rootcerts
+# (Anssi 08/2008) Require /etc/pki/java/cacerts.
+Requires: rootcerts-java
 # Require jpackage-utils for ant.
 Requires: jpackage-utils >= 1.7.3-1jpp.3
 # Require zoneinfo data provided by tzdata-java subpackage.
@@ -834,8 +833,9 @@ exit 0
 %{_jvmprivdir}/*
 %{jvmjardir}
 %dir %{_jvmdir}/%{jredir}/lib/security
+# (Anssi 08/2008)) A symlink to /etc/pki/java/cacerts:
+%{_jvmdir}/%{jredir}/lib/security/cacerts
 # FIXME: These should be replaced by symlinks into /etc.
-%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/cacerts
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
