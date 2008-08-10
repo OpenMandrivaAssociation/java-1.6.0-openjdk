@@ -105,7 +105,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.16.%{openjdkver}.3
+Release: %mkrel 0.16.%{openjdkver}.4
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -558,7 +558,7 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
   >> %{name}-demo.files
 
 # (Anssi 05/2008) for update-alternatives:
-install -d -m755 %{buildroot}%{_libdir}/mozilla/plugins
+install -d -m755 %{buildroot}%{syslibdir}/mozilla/plugins
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -922,8 +922,8 @@ exit 0
 %files plugin
 %defattr(-,root,root,-)
 %doc README.plugin
-%dir %{_libdir}/mozilla
-%dir %{_libdir}/mozilla/plugins
+%dir %{syslibdir}/mozilla
+%dir %{syslibdir}/mozilla/plugins
 %if 0
 %{_jvmdir}/%{jredir}/lib/%{archinstall}/gcjwebplugin.so
 %else
