@@ -132,9 +132,6 @@ URL:      http://icedtea.classpath.org/
 # tar cjf icedtea6.tar.bz2 icedtea6
 Source0:  %{url}download/source/icedtea6.tar.bz2
 Source1:  %{fedorazip}
-%if 0
-Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
-%endif
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  README.plugin
@@ -160,8 +157,6 @@ Patch104:   java-1.6.0-openjdk-agent-allfiles.patch
 Patch105:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch106:   icedtea6-1.2-javaws-desktop.patch
-# (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
-Patch109:   icedtea6-1.2-policytool-desktop.patch
 # (walluck): Fix icedtea-shark-build.patch
 Patch110:   icedtea6-shark-build.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -177,7 +172,6 @@ BuildRequires: libxt-devel
 BuildRequires: libxtst-devel
 BuildRequires: jpeg-devel
 BuildRequires: png-devel
-BuildRequires: rhino
 BuildRequires: wget
 BuildRequires: xalan-j2
 BuildRequires: xerces-j2
@@ -201,9 +195,6 @@ BuildRequires: eclipse-ecj
 Requires:      java-access-bridge
 BuildRequires: java-access-bridge
 # IcedTeaPlugin build requirements.
-%if 0
-BuildRequires: gecko-devel
-%endif
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
 BuildRequires: xulrunner-devel
@@ -218,25 +209,25 @@ BuildRequires: libffi-devel
 # visualvm build requirements.
 BuildRequires: netbeans-ide
 BuildRequires: jakarta-commons-logging
-
-Requires: rhino
-# (Anssi 08/2008) Require /etc/pki/java/cacerts.
+# Require /etc/pki/java/cacerts.
 Requires: rootcerts-java
+Requires: rhino
 # Require jpackage-utils for ant.
-Requires: jpackage-utils >= 1.7.3-1jpp.3
+Requires: jpackage-utils >= 1.7.3-1jpp.2
 # Require zoneinfo data provided by tzdata-java subpackage.
 Requires: tzdata-java
 # Post requires alternatives to install tool alternatives.
 Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
+%if %mdkversion < 200900
 # Post requires update-desktop-database to update desktop database
 # for jnlp files.
 Requires(post):   desktop-file-utils
 # Postun requires update-desktop-database to update desktop database
 # for jnlp files.
 Requires(postun): desktop-file-utils
-
+%endif
 # java-1.6.0-openjdk replaces java-1.7.0-icedtea.
 Provides: java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
@@ -365,13 +356,13 @@ The OpenJDK web browser plugin.
 %setup -q -n icedtea6
 %setup -q -n icedtea6 -T -D -a 1
 %setup -q -n icedtea6 -T -D -a 6
-%patch2
 %patch100
+%{_bindir}/autoreconf -i -v -f
+%patch2
 %patch103
 %patch104
 %patch105
 %patch106
-%patch109
 %patch110
 cp %{SOURCE4} .
 cp %{SOURCE5} .
@@ -380,7 +371,6 @@ cp %{SOURCE8} .
 cp %{SOURCE9} .
 cp %{SOURCE10} .
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
-%{_bindir}/autoreconf -i -v -f
 
 %build
 # Build IcedTea and OpenJDK.
@@ -646,7 +636,7 @@ update-alternatives\
 exit 0
 
 %postun
-if ! [ -e %{jrebindir}/java ]
+if [ $1 -eq 0 ]
 then
   update-alternatives --remove java %{jrebindir}/java
   update-alternatives --remove jre_%{origin} %{_jvmdir}/%{jrelnk}
@@ -836,7 +826,6 @@ exit 0
 %{_jvmprivdir}/*
 %{jvmjardir}
 %dir %{_jvmdir}/%{jredir}/lib/security
-# (Anssi 08/2008)) A symlink to /etc/pki/java/cacerts:
 %{_jvmdir}/%{jredir}/lib/security/cacerts
 # FIXME: These should be replaced by symlinks into /etc.
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
