@@ -3,20 +3,28 @@
 # java-1.6.0-openjdk-devel.
 %define gcjbootstrap 0
 
+# If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.2
-%define icedteasnapshot %{nil}
-%define openjdkver b11
-%define openjdkdate 10_jul_2008
-
+%define icedteaver 1.3.1
+%define icedteasnapshot -f31cffd9e5c8dffeb09bece53a32d64c3bc0a342
+%define openjdkver b13
+%define openjdkdate 05_nov_2008
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
-%define openjdkurlbase http://www.java.net/download/openjdk/jdk6/promoted/
+%define accessmajorver 1.23
+%define accessminorver 0
+%define accessver %{accessmajorver}.%{accessminorver}
+%define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
+
+%define visualvmurl http://icedtea.classpath.org/visualvm/
+%define netbeansurl http://nbi.netbeans.org/files/documents/210/2056/
+
+%define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
 %define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-dfsg.tar.bz2
 
-%define mauvedate 2008-03-11
+%define mauvedate 2008-10-22
 
 %define multilib_arches ppc64 sparc64 x86_64
 
@@ -63,14 +71,10 @@
 %define syslibdir       %{_prefix}/lib64
 %define _libdir         %{_prefix}/lib
 %define archname        %{name}.%{_arch}
-%define localpolicy     jce_%{javaver}_%{origin}_local_policy.%{_arch}
-%define uspolicy        jce_%{javaver}_%{origin}_us_export_policy.%{_arch}
 %define javaplugin      libjavaplugin.so.%{_arch}
 %else
 %define syslibdir       %{_libdir}
 %define archname        %{name}
-%define localpolicy     jce_%{javaver}_%{origin}_local_policy
-%define uspolicy        jce_%{javaver}_%{origin}_us_export_policy
 %define javaplugin      libjavaplugin.so
 %endif
 
@@ -105,7 +109,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.16.%{openjdkver}.4
+Release: %mkrel 0.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -128,32 +132,38 @@ URL:      http://icedtea.classpath.org/
 # tar cjf icedtea6.tar.bz2 icedtea6
 Source0:  %{url}download/source/icedtea6.tar.bz2
 Source1:  %{fedorazip}
+%if 0
+Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
+%endif
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  README.plugin
 Source6:  mauve-%{mauvedate}.tar.gz
 Source7:  mauve_tests
-Source10: generate-dfsg-zip.sh
+Source8:  %{netbeansurl}/netbeans-6.1-200805300101-basic_cluster-src.zip
+Source9:  %{visualvmurl}/netbeans-profiler-visualvm_preview2.tar.gz
+Source10: %{visualvmurl}/visualvm-20081031-src.tar.gz
+Source11: generate-dfsg-zip.sh
+Patch2:   java-1.6.0-openjdk-makefile.patch
+
 # FIXME: This patch needs to be fixed. optflags argument
 # -mtune=generic is being ignored because it breaks several graphical
 # applications.
 # (wallluck): Fixed to patch configure.ac, not configure
-Patch0:   java-1.6.0-openjdk-optflags.patch
+Patch100:   java-1.6.0-openjdk-optflags.patch
 # (walluck): Avoid crash when ht support is enabled
 # Non-Fedora patches:
-Patch3:   java-1.6.0-openjdk-no-ht-support.patch
+Patch103:   java-1.6.0-openjdk-no-ht-support.patch
 # (walluck): Work around a kernel issues with long argument lists
-Patch4:   java-1.6.0-openjdk-agent-allfiles.patch
+Patch104:   java-1.6.0-openjdk-agent-allfiles.patch
 # (walluck): Correctly use g++ and dynamic linking
-Patch5:   java-1.6.0-openjdk-link-cpp.patch
+Patch105:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
-Patch6:   icedtea6-1.2-javaws-desktop.patch
-# (Anssi 07/2008) Fixes build (without static libstdc++):
-#Patch8:   java-1.6.0-openjdk-link-cpp2.patch
+Patch106:   icedtea6-1.2-javaws-desktop.patch
 # (Nl)    Do not show policytool on KDE menu ( KDE menu cleaning task )
-Patch9:   icedtea6-1.2-policytool-desktop.patch
+Patch109:   icedtea6-1.2-policytool-desktop.patch
 # (walluck): Fix icedtea-shark-build.patch
-Patch10:   icedtea6-shark-build.patch
+Patch110:   icedtea6-shark-build.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -173,6 +183,7 @@ BuildRequires: xalan-j2
 BuildRequires: xerces-j2
 BuildRequires: ant
 BuildRequires: libxinerama-devel
+BuildRequires: rhino
 BuildRequires: zip
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
@@ -190,16 +201,25 @@ BuildRequires: eclipse-ecj
 Requires:      java-access-bridge
 BuildRequires: java-access-bridge
 # IcedTeaPlugin build requirements.
+%if 0
+BuildRequires: gecko-devel
+%endif
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
-BuildRequires: nspr-devel
 BuildRequires: xulrunner-devel
 BuildRequires: xulrunner-devel-unstable
+# PulseAudio build requirements.
+BuildRequires: pulseaudio-devel
+BuildRequires: pulseaudio
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
+# visualvm build requirements.
+BuildRequires: netbeans-ide
+BuildRequires: jakarta-commons-logging
 
+Requires: rhino
 # (Anssi 08/2008) Require /etc/pki/java/cacerts.
 Requires: rootcerts-java
 # Require jpackage-utils for ant.
@@ -250,6 +270,8 @@ Group:   Development/Java
 
 # Require base package.
 Requires:         %{name} = %{epoch}:%{version}-%{release}
+# Requirements for jvisualvm
+Requires:         libnb-platform8
 # Post requires alternatives to install tool alternatives.
 Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
@@ -340,32 +362,36 @@ Provides: java-%{javaver}-plugin = %{epoch}:%{version}
 The OpenJDK web browser plugin.
 
 %prep
-#%%setup -q -n icedtea6-%{icedteaver}
-#%%setup -q -n icedtea6-%{icedteaver} -T -D -a 1
-#%%setup -q -n icedtea6-%{icedteaver} -T -D -a 6
 %setup -q -n icedtea6
 %setup -q -n icedtea6 -T -D -a 1
 %setup -q -n icedtea6 -T -D -a 6
-%{_bindir}/autoreconf -i -v -f
-%patch0
-%patch3
-%patch4
-%patch5
-%patch6 -p1
-#%patch8 -p1
-%patch9 -p0
-%patch10
+%patch2
+%patch100
+%patch103
+%patch104
+%patch105
+%patch106
+%patch109
+%patch110
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
+cp %{SOURCE8} .
+cp %{SOURCE9} .
+cp %{SOURCE10} .
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
+%{_bindir}/autoreconf -i -v -f
 
 %build
 # Build IcedTea and OpenJDK.
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 export CFLAGS="%{optflags} -fno-tree-vrp"
-%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --enable-liveconnect
+%ifarch sparc64
+export ARCH_DATA_MODEL=64
+%endif
+%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --enable-visualvm \
+  --with-pkgversion=6%{openjdkver}-%{vendor}-%{mandriva_release}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
@@ -373,10 +399,12 @@ make stamps/patch.stamp
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
+
 pushd %{buildoutputdir}/j2sdk-image/jre/lib
   %{__ln_s}f %{_javadir}/accessibility.properties accessibility.properties
   %{__ln_s}f %{_javadir}/gnome-java-bridge.jar ext/gnome-java-bridge.jar
 popd
+
 %if %{runtests}
 # Run jtreg test suite.
 {
@@ -455,13 +483,6 @@ pushd %{buildoutputdir}/j2sdk-image
 
   # Install JCE policy symlinks.
   install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
-  for file in local_policy.jar US_export_policy.jar
-  do
-    mv -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file \
-      $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
-    # Touch files for ghosts.
-    touch $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/$file
-  done
 
   # Install versionless symlinks.
   pushd $RPM_BUILD_ROOT%{_jvmdir}
@@ -513,8 +534,10 @@ install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
 cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
 # (Anssi 07/2008) Mandriva patch:
 sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
-desktop-file-install \
+desktop-file-install --vendor ''\
   --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
+desktop-file-install --vendor ''\
+  --dir $RPM_BUILD_ROOT%{_datadir}/applications visualvm.desktop
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
@@ -528,7 +551,6 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
 # Find JRE files.
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
-  | grep -v gcjwebplugin.so \
   | grep -v IcedTeaPlugin.so \
   | sed 's|'$RPM_BUILD_ROOT'||' \
   >> %{name}.files
@@ -614,17 +636,6 @@ update-alternatives\
   --slave %{_jvmjardir}/jre-%{javaver} \
   jre_%{javaver}_exports %{_jvmjardir}/%{jrelnk}
 
-update-alternatives\
-  --install \
-  %{_jvmdir}/%{jrelnk}/lib/security/local_policy.jar \
-  %{localpolicy} \
-  %{_jvmprivdir}/%{archname}/jce/vanilla/local_policy.jar \
-  %{priority} \
-  --slave \
-  %{_jvmdir}/%{jrelnk}/lib/security/US_export_policy.jar \
-  %{uspolicy} \
-  %{_jvmprivdir}/%{archname}/jce/vanilla/US_export_policy.jar
-
 # Update for jnlp handling.
 %if %mdkversion < 200900
 %update_desktop_database
@@ -640,9 +651,6 @@ then
   update-alternatives --remove java %{jrebindir}/java
   update-alternatives --remove jre_%{origin} %{_jvmdir}/%{jrelnk}
   update-alternatives --remove jre_%{javaver} %{_jvmdir}/%{jrelnk}
-  update-alternatives --remove \
-    %{localpolicy} \
-    %{_jvmprivdir}/%{archname}/jce/vanilla/local_policy.jar
 fi
 
 # Update for jnlp handling.
@@ -679,6 +687,7 @@ update-alternatives\
   --slave %{_bindir}/jstack jstack %{sdkbindir}/jstack \
   --slave %{_bindir}/jstat jstat %{sdkbindir}/jstat \
   --slave %{_bindir}/jstatd jstatd %{sdkbindir}/jstatd \
+  --slave %{_bindir}/jvisualvm jvisualvm %{sdkbindir}/jvisualvm \
   --slave %{_bindir}/native2ascii native2ascii %{sdkbindir}/native2ascii \
   --slave %{_bindir}/rmic rmic %{sdkbindir}/rmic \
   --slave %{_bindir}/schemagen schemagen %{sdkbindir}/schemagen \
@@ -759,7 +768,7 @@ update-alternatives\
 exit 0
 
 %postun devel
-if ! [ -e %{sdkbindir}/javac ]
+if [ $1 -eq 0 ]
 then
   update-alternatives --remove javac %{sdkbindir}/javac
   update-alternatives --remove java_sdk_%{origin} %{_jvmdir}/%{sdklnk}
@@ -787,31 +796,25 @@ fi
 exit 0
 
 %post plugin
-%if 0
-update-alternatives\
-  --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so %{priority}
-%else
-update-alternatives\
-  --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
-%endif
-exit 0
-
-%postun plugin
-%if 0
-if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so ]
+if [ $1 -eq 2 ]
 then
   update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
 fi
-%else
-if ! [ -e %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so ]
+
+update-alternatives\
+  --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
+  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
+
+exit 0
+
+%postun plugin
+if [ $1 -eq 0 ]
 then
   update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
 fi
-%endif
+
 exit 0
 
 %files -f %{name}.files
@@ -838,8 +841,6 @@ exit 0
 # FIXME: These should be replaced by symlinks into /etc.
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
-%ghost %{_jvmdir}/%{jredir}/lib/security/local_policy.jar
-%ghost %{_jvmdir}/%{jredir}/lib/security/US_export_policy.jar
 %{_datadir}/applications/*policytool.desktop
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
@@ -900,6 +901,7 @@ exit 0
 %{_mandir}/man1/wsgen-%{name}.1*
 %{_mandir}/man1/wsimport-%{name}.1*
 %{_mandir}/man1/xjc-%{name}.1*
+%{_datadir}/applications/visualvm.desktop
 
 %files demo -f %{name}-demo.files
 %defattr(-,root,root,-)
@@ -924,8 +926,4 @@ exit 0
 %doc README.plugin
 %dir %{syslibdir}/mozilla
 %dir %{syslibdir}/mozilla/plugins
-%if 0
-%{_jvmdir}/%{jredir}/lib/%{archinstall}/gcjwebplugin.so
-%else
 %{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
-%endif
