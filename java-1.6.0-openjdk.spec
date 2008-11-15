@@ -1,3 +1,5 @@
+%bcond_with visualvm
+
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
@@ -126,10 +128,7 @@ Group:   Development/Java
 
 License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
-#Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
-# hg clone http://icedtea.classpath.org/hg/icedtea6
-# rm -rf icedtea6/.hg
-# tar cjf icedtea6.tar.bz2 icedtea6
+# hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
 Source0:  %{url}download/source/icedtea6.tar.bz2
 Source1:  %{fedorazip}
 Source3:  %{genurl}generate-fedora-zip.sh
@@ -206,9 +205,11 @@ BuildRequires: pulseaudio
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
 %endif
+%if %with visualvm
 # visualvm build requirements.
 BuildRequires: netbeans-ide
 BuildRequires: jakarta-commons-logging
+%endif
 # Require /etc/pki/java/cacerts.
 Requires: rootcerts-java
 Requires: rhino
@@ -254,6 +255,10 @@ Provides: java-sasl = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
+%if %without visualvm
+
+This version is built without netbeans, so jvisualvm is disabled.
+%endif
 
 %package devel
 Summary: OpenJDK Development Environment
@@ -261,8 +266,10 @@ Group:   Development/Java
 
 # Require base package.
 Requires:         %{name} = %{epoch}:%{version}-%{release}
+%if %with visualvm
 # Requirements for jvisualvm
 Requires:         libnb-platform8
+%endif
 # Post requires alternatives to install tool alternatives.
 Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
@@ -380,7 +387,12 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 %ifarch sparc64
 export ARCH_DATA_MODEL=64
 %endif
-%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} --enable-visualvm \
+%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
+%if %with visualvm
+  --enable-visualvm \
+%else
+  --disable-visualvm \
+%endif
   --with-pkgversion=6%{openjdkver}-%{vendor}-%{mandriva_release}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
@@ -526,8 +538,10 @@ cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
 sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
 desktop-file-install --vendor ''\
   --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
+%if %with visualvm
 desktop-file-install --vendor ''\
   --dir $RPM_BUILD_ROOT%{_datadir}/applications visualvm.desktop
+%endif
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
@@ -677,7 +691,9 @@ update-alternatives\
   --slave %{_bindir}/jstack jstack %{sdkbindir}/jstack \
   --slave %{_bindir}/jstat jstat %{sdkbindir}/jstat \
   --slave %{_bindir}/jstatd jstatd %{sdkbindir}/jstatd \
+%if %with visualvm
   --slave %{_bindir}/jvisualvm jvisualvm %{sdkbindir}/jvisualvm \
+%endif
   --slave %{_bindir}/native2ascii native2ascii %{sdkbindir}/native2ascii \
   --slave %{_bindir}/rmic rmic %{sdkbindir}/rmic \
   --slave %{_bindir}/schemagen schemagen %{sdkbindir}/schemagen \
@@ -890,7 +906,9 @@ exit 0
 %{_mandir}/man1/wsgen-%{name}.1*
 %{_mandir}/man1/wsimport-%{name}.1*
 %{_mandir}/man1/xjc-%{name}.1*
+%if %with visualvm
 %{_datadir}/applications/visualvm.desktop
+%endif
 
 %files demo -f %{name}-demo.files
 %defattr(-,root,root,-)
