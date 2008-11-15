@@ -393,7 +393,7 @@ export ARCH_DATA_MODEL=64
 %else
   --disable-visualvm \
 %endif
-  --with-pkgversion=6%{openjdkver}-%{vendor}-%{mandriva_release}
+  --with-pkgversion=6%{openjdkver}-%{release}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
