@@ -8,10 +8,11 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.3.1
-%define icedteasnapshot -f31cffd9e5c8dffeb09bece53a32d64c3bc0a342
-%define openjdkver b13
-%define openjdkdate 05_nov_2008
+%define icedteaver 1.4
+%define icedteasnapshot -7801bbe25e3a2f4edecc7d510b28de1d485010f9
+%define openjdkver b14
+%define openjdkdate 25_nov_2008
+
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
 %define accessmajorver 1.23
@@ -21,6 +22,7 @@
 
 %define visualvmurl http://icedtea.classpath.org/visualvm/
 %define netbeansurl http://nbi.netbeans.org/files/documents/210/2056/
+%define hotspoturl  http://hg.openjdk.java.net/jdk7/hotspot/hotspot/archive/
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
@@ -111,7 +113,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.17.%{openjdkver}.1
+Release: %mkrel 0.18.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -139,7 +141,8 @@ Source7:  mauve_tests
 Source8:  %{netbeansurl}/netbeans-6.1-200805300101-basic_cluster-src.zip
 Source9:  %{visualvmurl}/netbeans-profiler-visualvm_preview2.tar.gz
 Source10: %{visualvmurl}/visualvm-20081031-src.tar.gz
-Source11: generate-dfsg-zip.sh
+Source11: %{hotspoturl}/hotspot.tar.gz
+Source12: generate-dfsg-zip.sh
 Patch2:   java-1.6.0-openjdk-makefile.patch
 
 # FIXME: This patch needs to be fixed. optflags argument
@@ -199,8 +202,8 @@ BuildRequires: gtk2-devel
 BuildRequires: xulrunner-devel
 BuildRequires: xulrunner-devel-unstable
 # PulseAudio build requirements.
-BuildRequires: pulseaudio-devel
-BuildRequires: pulseaudio
+BuildRequires: pulseaudio-devel >= 0.9.11
+BuildRequires: pulseaudio >= 0.9.11
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
@@ -252,6 +255,7 @@ Provides: jsse = %{epoch}:%{version}
 Provides: jce = %{epoch}:%{version}
 Provides: jdbc-stdext = 3.0
 Provides: java-sasl = %{epoch}:%{version}
+Provides: java-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
@@ -377,7 +381,9 @@ cp %{SOURCE7} .
 cp %{SOURCE8} .
 cp %{SOURCE9} .
 cp %{SOURCE10} .
+cp %{SOURCE11} .
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
+./autogen.sh
 
 %build
 # Build IcedTea and OpenJDK.
@@ -393,11 +399,12 @@ export ARCH_DATA_MODEL=64
 %else
   --disable-visualvm \
 %endif
-  --with-pkgversion=6%{openjdkver}-%{release}
+  --with-pkgversion=mandriva-%{release}-%{_arch} --enable-pulse-java \
+  --with-hotspot-src-zip=hotspot.tar.gz
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
-make stamps/patch.stamp
+make patch
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
@@ -414,7 +421,7 @@ popd
   export DISPLAY=:20
   Xvfb :20 -screen 0 1x1x24 -ac&
   echo $! > Xvfb.pid
-  make jtregcheck -k | tee jtreg_output
+  make jtregcheck -k
   kill -9 `cat Xvfb.pid`
   unset DISPLAY
   rm -f Xvfb.pid
@@ -802,7 +809,7 @@ fi
 exit 0
 
 %post plugin
-if [ $1 -eq 2 ]
+if [ $1 -gt 1 ]
 then
   update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
@@ -921,7 +928,7 @@ exit 0
 # FIXME: put these in a separate testresults subpackage.
 %doc mauve_tests
 %doc mauve-%{mauvedate}/mauve_output
-%doc jtreg_output
+%doc test/jtreg-summary.log
 %endif
 
 %files javadoc
