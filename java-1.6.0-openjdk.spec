@@ -143,6 +143,7 @@ Source9:  %{visualvmurl}/netbeans-profiler-visualvm_preview2.tar.gz
 Source10: %{visualvmurl}/visualvm-20081031-src.tar.gz
 Source11: %{hotspoturl}/hotspot.tar.gz
 Source12: generate-dfsg-zip.sh
+# removes visualvm and fsg.sh
 Patch2:   java-1.6.0-openjdk-makefile.patch
 
 # FIXME: This patch needs to be fixed. optflags argument
@@ -150,7 +151,7 @@ Patch2:   java-1.6.0-openjdk-makefile.patch
 # applications.
 # (wallluck): Fixed to patch configure.ac, not configure
 Patch100:   java-1.6.0-openjdk-optflags.patch
-# (walluck): Avoid crash when ht support is enabled
+# (walluck): Avoid crash when ht support is enabled by disabling ht support
 # Non-Fedora patches:
 Patch103:   java-1.6.0-openjdk-no-ht-support.patch
 # (walluck): Work around a kernel issues with long argument lists
@@ -374,7 +375,9 @@ The OpenJDK web browser plugin.
 %patch104
 %patch105
 %patch106
-%patch110
+# XXX: instead of Patch110
+rm patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
+touch patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
 cp %{SOURCE4} .
 cp %{SOURCE5} .
 cp %{SOURCE7} .
