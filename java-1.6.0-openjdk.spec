@@ -8,8 +8,8 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.4
-%define icedteasnapshot -7801bbe25e3a2f4edecc7d510b28de1d485010f9
+%define icedteaver 1.4.1
+%define icedteasnapshot %{nil}
 %define openjdkver b14
 %define openjdkdate 25_nov_2008
 
@@ -20,8 +20,9 @@
 %define accessver %{accessmajorver}.%{accessminorver}
 %define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
-%define visualvmurl http://icedtea.classpath.org/visualvm/
-%define netbeansurl http://nbi.netbeans.org/files/documents/210/2056/
+
+%define visualvmurl https://visualvm.dev.java.net/files/documents/7163/127067/
+%define netbeansurl http://icedtea.classpath.org/visualvm/
 %define hotspoturl  http://hg.openjdk.java.net/jdk7/hotspot/hotspot/archive/
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
@@ -32,7 +33,7 @@
 
 %define multilib_arches ppc64 sparc64 x86_64
 
-%define jit_arches %{ix86} x86_64
+%define jit_arches %{ix86} x86_64 sparcv9 sparc64
 
 %ifarch %{ix86}
 %define archbuild i586
@@ -41,6 +42,16 @@
 %ifarch x86_64
 %define archbuild amd64
 %define archinstall amd64
+%endif
+# 32 bit sparc, optimized for v9
+%ifarch sparcv9
+%define archbuild sparc
+%define archinstall sparc
+%endif
+# 64 bit sparc
+%ifarch sparc64
+%define archbuild sparcv9
+%define archinstall sparcv9
 %endif
 %ifnarch %{jit_arches}
 %define archbuild %{_arch}
@@ -113,7 +124,7 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
-Release: %mkrel 0.18.%{openjdkver}.1
+Release: %mkrel 0.19.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -131,37 +142,53 @@ Group:   Development/Java
 License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 # hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
-Source0:  %{url}download/source/icedtea6.tar.bz2
+Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+# Fedora sources
 Source1:  %{fedorazip}
+# (fhimpe) Disabled: we use system java-access-bridge in Mandriva
+#Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
-Source5:  README.plugin
-Source6:  mauve-%{mauvedate}.tar.gz
-Source7:  mauve_tests
-Source8:  %{netbeansurl}/netbeans-6.1-200805300101-basic_cluster-src.zip
-Source9:  %{visualvmurl}/netbeans-profiler-visualvm_preview2.tar.gz
-Source10: %{visualvmurl}/visualvm-20081031-src.tar.gz
-Source11: %{hotspoturl}/hotspot.tar.gz
-Source12: generate-dfsg-zip.sh
-# removes visualvm and fsg.sh
-Patch2:   java-1.6.0-openjdk-makefile.patch
+Source5:  mauve-%{mauvedate}.tar.gz
+Source6:  mauve_tests
+Source7: %{hotspoturl}/hotspot.tar.gz
+Source8: %{netbeansurl}/netbeans-profiler-visualvm_release65_mod.tar.gz
+Source9: %{visualvmurl}/visualvm-11-src.tar.gz
 
+# Mandriva sources
+Source100: README.plugin
+
+# Fedora patches
 # FIXME: This patch needs to be fixed. optflags argument
 # -mtune=generic is being ignored because it breaks several graphical
 # applications.
 # (wallluck): Fixed to patch configure.ac, not configure
-Patch100:   java-1.6.0-openjdk-optflags.patch
-# (walluck): Avoid crash when ht support is enabled by disabling ht support
+Patch0:   java-1.6.0-openjdk-optflags.patch
+#Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
+# Removes fsg.sh
+Patch2:   java-1.6.0-openjdk-makefile.patch
+#Patch3:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
+Patch4:   java-1.6.0-openjdk-java-access-bridge-security.patch
+Patch5:   java-1.6.0-openjdk-accessible-toolkit.patch
+Patch6:   java-1.6.0-openjdk-sparc-fixes.patch
+Patch7:   java-1.6.0-openjdk-sparc-hotspot.patch
+Patch8:   java-1.6.0-openjdk-lcms.patch
+Patch9:   java-1.6.0-openjdk-securitypatches.patch
+Patch10:  java-1.6.0-openjdk-pulsejava.patch
+
 # Non-Fedora patches:
-Patch103:   java-1.6.0-openjdk-no-ht-support.patch
+# (walluck): Avoid crash when ht support is enabled by disabling ht support
+Patch100:   java-1.6.0-openjdk-no-ht-support.patch
 # (walluck): Work around a kernel issues with long argument lists
-Patch104:   java-1.6.0-openjdk-agent-allfiles.patch
+Patch101:   java-1.6.0-openjdk-agent-allfiles.patch
 # (walluck): Correctly use g++ and dynamic linking
-Patch105:   java-1.6.0-openjdk-link-cpp.patch
+Patch102:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
-Patch106:   icedtea6-1.2-javaws-desktop.patch
+Patch103:   icedtea6-1.2-javaws-desktop.patch
 # (walluck): Fix icedtea-shark-build.patch
-Patch110:   icedtea6-shark-build.patch
+Patch104:   icedtea6-shark-build.patch
+
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -365,28 +392,40 @@ Provides: java-%{javaver}-plugin = %{epoch}:%{version}
 The OpenJDK web browser plugin.
 
 %prep
-%setup -q -n icedtea6
-%setup -q -n icedtea6 -T -D -a 1
-%setup -q -n icedtea6 -T -D -a 6
+%setup -q -n icedtea6-%{icedteaver}
+%setup -q -n icedtea6-%{icedteaver} -T -D -a 1
 %patch100
-%{_bindir}/autoreconf -i -v -f
+%setup -q -n icedtea6-%{icedteaver} -T -D -a 5
+#%setup -q -n icedtea6-%{icedteaver} -T -D -a 2
+%setup -q -n icedtea6-%{icedteaver} -T -D -a 7
+cp -R hotspot*/* openjdk/hotspot/
+rm -rf hotspot*
+%patch0
 %patch2
+%patch4
+%patch5
+%patch6 -p1
+%patch7
+%patch8
+%patch9
+%patch10
+%patch101
+%patch102
 %patch103
 %patch104
-%patch105
-%patch106
-# XXX: instead of Patch110
+
+## XXX: instead of Patch110
 rm patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
 touch patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
 cp %{SOURCE4} .
-cp %{SOURCE5} .
-cp %{SOURCE7} .
+cp %{SOURCE6} .
 cp %{SOURCE8} .
 cp %{SOURCE9} .
-cp %{SOURCE10} .
-cp %{SOURCE11} .
+cp %{SOURCE100} . 
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
+%{_bindir}/autoreconf -i -v -f
 ./autogen.sh
+
 
 %build
 # Build IcedTea and OpenJDK.
@@ -402,8 +441,7 @@ export ARCH_DATA_MODEL=64
 %else
   --disable-visualvm \
 %endif
-  --with-pkgversion=mandriva-%{release}-%{_arch} --enable-pulse-java \
-  --with-hotspot-src-zip=hotspot.tar.gz
+  --with-pkgversion=mandriva-%{release}-%{_arch} --enable-pulse-java
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
@@ -441,7 +479,7 @@ popd
     Xvfb :20 -screen 0 1x1x24 -ac&
     echo $! > Xvfb.pid
     $JAVA_HOME/bin/java Harness -vm $JAVA_HOME/bin/java \
-      -file %{SOURCE7} -timeout 30000 2>&1 | tee mauve_output
+      -file %{SOURCE6} -timeout 30000 2>&1 | tee mauve_output
     kill -9 `cat Xvfb.pid`
     unset DISPLAY
     rm -f Xvfb.pid
