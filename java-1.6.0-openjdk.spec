@@ -124,6 +124,9 @@
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
+%if %mdkversion < 200910
+%define subrel  1
+%endif
 Release: %mkrel 0.19.%{openjdkver}.2
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
@@ -231,9 +234,11 @@ BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
 BuildRequires: xulrunner-devel
 BuildRequires: xulrunner-devel-unstable
+%if %mdkversion >= 200910
 # PulseAudio build requirements.
 BuildRequires: pulseaudio-devel >= 0.9.11
 BuildRequires: pulseaudio >= 0.9.11
+%endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
@@ -444,7 +449,13 @@ export ARCH_DATA_MODEL=64
 %else
   --disable-visualvm \
 %endif
-  --with-pkgversion=mandriva-%{release}-%{_arch} --enable-pulse-java
+  --with-pkgversion=mandriva-%{release}-%{_arch} \
+%if %mdkversion >= 200910
+  --enable-pulse-java
+%else
+  --disable-pulse-java
+%endif
+
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
