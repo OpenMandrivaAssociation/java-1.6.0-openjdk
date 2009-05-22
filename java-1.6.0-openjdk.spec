@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.19.%{openjdkver}.3
+Release: %mkrel 0.19.%{openjdkver}.4
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -193,6 +193,8 @@ Patch104:   icedtea6-shark-build.patch
 # (tpg) https://qa.mandriva.com/show_bug.cgi?id=49908
 # prevents java waiting endlessly for cookies
 Patch105:   java-1.6.0-openjdk-set-cookie-handling.patch
+# (fwang) Use our own CJK ttf path when mapping
+Patch106:   icedtea6-1.4.1-mandriva-fontpath.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -421,6 +423,7 @@ rm -rf hotspot*
 %patch103
 %patch104
 %patch105 -p1
+%patch106 -p0
 
 ## XXX: instead of Patch110
 rm patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
