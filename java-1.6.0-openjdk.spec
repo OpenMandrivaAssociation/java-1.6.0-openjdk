@@ -8,10 +8,10 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.4.1
+%define icedteaver 1.5
 %define icedteasnapshot %{nil}
-%define openjdkver b14
-%define openjdkdate 25_nov_2008
+%define openjdkver b16
+%define openjdkdate 24_apr_2009
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
@@ -27,7 +27,7 @@
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-dfsg.tar.bz2
+%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.bz2
 
 %define mauvedate 2008-10-22
 
@@ -64,7 +64,7 @@
 %define runtests 0
 %endif
 
-%define buildoutputdir openjdk/control/build/linux-%{archbuild}
+%define buildoutputdir openjdk/build/linux-%{archbuild}
 
 %if %{gcjbootstrap}
 %define icedteaopt --with-java=%{_jvmdir}/java-gcj/bin/java --with-ecj=%{_jvmdir}/java-gcj/bin/javac --with-javah=%{_jvmdir}/java-gcj/bin/javah --with-jar=%{_jvmdir}/java-gcj/bin/jar --with-rmic=%{_jvmdir}/java-gcj/bin/rmic --with-libgcj-jar=%{_jvmdir}/jre-gcj/lib/rt.jar
@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.19.%{openjdkver}.4
+Release: %mkrel 0.20.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -170,14 +170,16 @@ Patch0:   java-1.6.0-openjdk-optflags.patch
 #Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
 # Removes fsg.sh
 Patch2:   java-1.6.0-openjdk-makefile.patch
-#Patch3:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
+# Patch3:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
 Patch4:   java-1.6.0-openjdk-java-access-bridge-security.patch
 Patch5:   java-1.6.0-openjdk-accessible-toolkit.patch
 Patch6:   java-1.6.0-openjdk-sparc-fixes.patch
 Patch7:   java-1.6.0-openjdk-sparc-hotspot.patch
-Patch8:   java-1.6.0-openjdk-lcms.patch
-Patch9:   java-1.6.0-openjdk-securitypatches.patch
-Patch10:  java-1.6.0-openjdk-pulsejava.patch
+
+# fixed with build 16 (upstream)
+# Patch8:   java-1.6.0-openjdk-lcms.patch
+# Patch9:   java-1.6.0-openjdk-securitypatches.patch
+# Patch10:  java-1.6.0-openjdk-pulsejava.patch
 
 # Non-Fedora patches:
 # (walluck): Avoid crash when ht support is enabled by disabling ht support
@@ -188,13 +190,18 @@ Patch101:   java-1.6.0-openjdk-agent-allfiles.patch
 Patch102:   java-1.6.0-openjdk-link-cpp.patch
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch103:   icedtea6-1.2-javaws-desktop.patch
-# (walluck): Fix icedtea-shark-build.patch
-Patch104:   icedtea6-shark-build.patch
+# (cabral): Fix icedtea-shark-build.patch (incompatible with java-1.6.0-openjdk-link-cpp.patch)
+Patch104:   fix-icedtea-shark-build.patch
 # (tpg) https://qa.mandriva.com/show_bug.cgi?id=49908
 # prevents java waiting endlessly for cookies
-Patch105:   java-1.6.0-openjdk-set-cookie-handling.patch
+# (applied upstream/ build 16)
+# Patch105:   java-1.6.0-openjdk-set-cookie-handling.patch
+# (cabral): Fix icedtea-ignore-unrecognized-options.patch
+Patch106:   icedtea-ignore-unrecognized-options.patch 
+# (cabral): Fix icedtea-sparc-trapsfix.patch
+Patch107:   icedtea-sparc-trapsfix.patch
 # (fwang) Use our own CJK ttf path when mapping
-Patch106:   icedtea6-1.4.1-mandriva-fontpath.patch
+Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -415,19 +422,18 @@ rm -rf hotspot*
 %patch5
 %patch6 -p1
 %patch7
-%patch8
-%patch9
-%patch10
 %patch101
 %patch102
 %patch103
 %patch104
-%patch105 -p1
-%patch106 -p0
+%patch106 
+%patch107
+%patch108
 
-## XXX: instead of Patch110
-rm patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
-touch patches/hotspot/{14.0b08,original}/icedtea-shark-build.patch
+## XXX: instead of Patch106
+rm patches/hotspot/default/icedtea-ignore-unrecognized-options.patch
+touch patches/hotspot/default/icedtea-ignore-unrecognized-options.patch
+
 cp %{SOURCE4} .
 cp %{SOURCE6} .
 cp %{SOURCE8} .
@@ -999,3 +1005,4 @@ exit 0
 %dir %{syslibdir}/mozilla
 %dir %{syslibdir}/mozilla/plugins
 %{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
+
