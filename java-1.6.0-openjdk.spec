@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.1
+Release: %mkrel 0.20.%{openjdkver}.2
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -175,7 +175,8 @@ Patch4:   java-1.6.0-openjdk-java-access-bridge-security.patch
 Patch5:   java-1.6.0-openjdk-accessible-toolkit.patch
 Patch6:   java-1.6.0-openjdk-sparc-fixes.patch
 Patch7:   java-1.6.0-openjdk-sparc-hotspot.patch
-
+Patch8:   java-1.6.0-openjdk-netxandplugin.patch
+Patch9:   java-1.6.0-openjdk-securitypatches.patch
 # fixed with build 16 (upstream)
 # Patch8:   java-1.6.0-openjdk-lcms.patch
 # Patch9:   java-1.6.0-openjdk-securitypatches.patch
@@ -469,6 +470,8 @@ export ARCH_DATA_MODEL=64
 make stamps/patch-ecj.stamp
 %endif
 make patch
+patch -l -p0 < %{PATCH8}
+patch -l -p0 < %{PATCH9}
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
