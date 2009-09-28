@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.5
+Release: %mkrel 0.20.%{openjdkver}.6
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -203,6 +203,8 @@ Patch106:   icedtea-ignore-unrecognized-options.patch
 Patch107:   icedtea-sparc-trapsfix.patch
 # (fwang) Use our own CJK ttf path when mapping
 Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
+# (teuf) Use libjpeg 7 instead of libjpeg 6.2
+Patch109:   icedtea6-1.5-use-libjpeg7.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -432,6 +434,7 @@ rm -rf hotspot*
 %patch106 
 %patch107
 %patch108
+%patch109 -p1
 
 ## XXX: instead of Patch106
 rm patches/hotspot/default/icedtea-ignore-unrecognized-options.patch
