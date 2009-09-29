@@ -266,7 +266,7 @@ BuildRequires: jakarta-commons-logging
 Requires: rootcerts-java
 Requires: rhino
 # libjpeg is dlopened, add an explicit Requires: on it
-Requires: libjpeg = 7
+Requires: %{mklibname jpeg7}
 # Require jpackage-utils for ant.
 Requires: jpackage-utils >= 1.7.3-1jpp.2
 # Require zoneinfo data provided by tzdata-java subpackage.
