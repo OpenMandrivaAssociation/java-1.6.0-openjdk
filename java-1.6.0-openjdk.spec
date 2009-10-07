@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.6
+Release: %mkrel 0.20.%{openjdkver}.7
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -914,7 +914,6 @@ exit 0
 %doc openjdk/TRADEMARK
 %doc AUTHORS
 %doc COPYING
-%doc ChangeLog
 %doc NEWS
 %doc README
 %dir %{_jvmdir}/%{sdkdir}
@@ -944,6 +943,7 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
+%doc ChangeLog
 %doc %{buildoutputdir}/j2sdk-image/ASSEMBLY_EXCEPTION
 %doc %{buildoutputdir}/j2sdk-image/LICENSE
 %doc %{buildoutputdir}/j2sdk-image/README.html
