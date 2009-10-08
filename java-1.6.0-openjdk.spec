@@ -8,18 +8,18 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.5
+%define icedteaver 1.6
 %define icedteasnapshot %{nil}
 %define openjdkver b16
 %define openjdkdate 24_apr_2009
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
-%define accessmajorver 1.23
-%define accessminorver 0
-%define accessver %{accessmajorver}.%{accessminorver}
-%define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
-
+# cabral (fhimpe) we already use java-acess-bridge in Mandriva
+# define accessmajorver 1.23
+# define accessminorver 0
+# define accessver %{accessmajorver}.%{accessminorver}
+# define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
 %define visualvmurl https://visualvm.dev.java.net/files/documents/7163/127067/
 %define netbeansurl http://icedtea.classpath.org/visualvm/
@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.7
+Release: %mkrel 0.20.%{openjdkver}.8
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -167,40 +167,24 @@ Source100: README.plugin
 # applications.
 # (wallluck): Fixed to patch configure.ac, not configure
 Patch0:   java-1.6.0-openjdk-optflags.patch
-#Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
-# Removes fsg.sh
-Patch2:   java-1.6.0-openjdk-makefile.patch
-# Patch3:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
-Patch4:   java-1.6.0-openjdk-java-access-bridge-security.patch
-Patch5:   java-1.6.0-openjdk-accessible-toolkit.patch
-Patch6:   java-1.6.0-openjdk-sparc-fixes.patch
-Patch7:   java-1.6.0-openjdk-sparc-hotspot.patch
-Patch8:   java-1.6.0-openjdk-netxandplugin.patch
-Patch9:   java-1.6.0-openjdk-securitypatches.patch
-# fixed with build 16 (upstream)
-# Patch8:   java-1.6.0-openjdk-lcms.patch
-# Patch9:   java-1.6.0-openjdk-securitypatches.patch
-# Patch10:  java-1.6.0-openjdk-pulsejava.patch
+# (cabral): We already use java-acess-bridge in Mandriva 
+# TODO: make sure these access-bridge patches are present on that package
+# Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
+# Patch2:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
+# Patch3:   java-1.6.0-openjdk-java-access-bridge-security.patch
+Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
+Patch5:   java-1.6.0-openjdk-sparc-fixes.patch
+Patch6:   java-1.6.0-openjdk-sparc-hotspot.patch
+Patch7:   java-1.6.0-openjdk-x11.patch
 
-# Non-Fedora patches:
-# (walluck): Avoid crash when ht support is enabled by disabling ht support
-Patch100:   java-1.6.0-openjdk-no-ht-support.patch
-# (walluck): Work around a kernel issues with long argument lists
-Patch101:   java-1.6.0-openjdk-agent-allfiles.patch
-# (walluck): Correctly use g++ and dynamic linking
-Patch102:   java-1.6.0-openjdk-link-cpp.patch
+# (cabral) removed patches
+# Patch2:   java-1.6.0-openjdk-makefile.patch
+# Patch8:   java-1.6.0-openjdk-netxandplugin.patch (removed)
+# Patch9:   java-1.6.0-openjdk-securitypatches.patch (removed)
+
+# Mandriva patches
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch103:   icedtea6-1.2-javaws-desktop.patch
-# (cabral): Fix icedtea-shark-build.patch (incompatible with java-1.6.0-openjdk-link-cpp.patch)
-Patch104:   fix-icedtea-shark-build.patch
-# (tpg) https://qa.mandriva.com/show_bug.cgi?id=49908
-# prevents java waiting endlessly for cookies
-# (applied upstream/ build 16)
-# Patch105:   java-1.6.0-openjdk-set-cookie-handling.patch
-# (cabral): Fix icedtea-ignore-unrecognized-options.patch
-Patch106:   icedtea-ignore-unrecognized-options.patch 
-# (cabral): Fix icedtea-sparc-trapsfix.patch
-Patch107:   icedtea-sparc-trapsfix.patch
 # (fwang) Use our own CJK ttf path when mapping
 Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
@@ -416,51 +400,30 @@ The OpenJDK web browser plugin.
 
 %prep
 %setup -q -n icedtea6-%{icedteaver}
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 1
-%patch100
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 5
-#%setup -q -n icedtea6-%{icedteaver} -T -D -a 2
-%setup -q -n icedtea6-%{icedteaver} -T -D -a 7
-cp -R hotspot*/* openjdk/hotspot/
-rm -rf hotspot*
 %patch0
-%patch2
-%patch4
-%patch5
-%patch6 -p1
-%patch7
-%patch101
-%patch102
+%patch5 -p1
 %patch103
-%patch104
-%patch106 
-%patch107
 %patch108
 %patch109 -p1
-
-## XXX: instead of Patch106
-rm patches/hotspot/default/icedtea-ignore-unrecognized-options.patch
-touch patches/hotspot/default/icedtea-ignore-unrecognized-options.patch
 
 cp %{SOURCE4} .
 cp %{SOURCE6} .
 cp %{SOURCE8} .
+cp %{SOURCE7} .
 cp %{SOURCE9} .
 cp %{SOURCE100} . 
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
 %{_bindir}/autoreconf -i -v -f
 ./autogen.sh
 
-
 %build
 # Build IcedTea and OpenJDK.
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 export CFLAGS="%{optflags} -fno-tree-vrp"
-%ifarch sparc64
-export ARCH_DATA_MODEL=64
-%endif
 %{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
+  --with-hotspot-src-zip=%{SOURCE7} \
 %if %with visualvm
   --enable-visualvm \
 %else
@@ -477,8 +440,10 @@ export ARCH_DATA_MODEL=64
 make stamps/patch-ecj.stamp
 %endif
 make patch
-patch -l -p0 < %{PATCH8}
-patch -l -p0 < %{PATCH9}
+# patch -l -p0 < %{PATCH3}
+patch -l -p0 < %{PATCH4}
+patch -l -p0 < %{PATCH6}
+patch -l -p0 < %{PATCH7}
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
