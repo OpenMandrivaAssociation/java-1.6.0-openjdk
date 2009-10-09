@@ -197,6 +197,8 @@ BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
 BuildRequires: lesstif-devel
+# BuildRequires: %{mklibname xorg-x11-devel}
+BuildRequires: x11-proto-devel
 BuildRequires: libxi-devel
 BuildRequires: libxp-devel
 BuildRequires: libxt-devel
