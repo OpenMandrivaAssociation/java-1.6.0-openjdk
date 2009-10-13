@@ -189,6 +189,8 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
 Patch109:   icedtea6-1.5-use-libjpeg7.patch
+# (cabral) changes xshmproto.h to XShm.h since there is no header spliting yet
+Patch110:  x11-proto-devel-header.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -198,7 +200,7 @@ BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
 BuildRequires: lesstif-devel
 # BuildRequires: %{mklibname xorg-x11-devel}
-BuildRequires: x11-proto-devel >= 7.5
+BuildRequires: x11-proto-devel
 BuildRequires: libxi-devel
 BuildRequires: libxp-devel
 BuildRequires: libxt-devel
@@ -446,6 +448,7 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p0 < %{PATCH6}
 patch -l -p0 < %{PATCH7}
+patch -l -p0 < %{PATCH110}
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
