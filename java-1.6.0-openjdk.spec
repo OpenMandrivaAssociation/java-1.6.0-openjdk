@@ -175,7 +175,6 @@ Patch0:   java-1.6.0-openjdk-optflags.patch
 Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
 Patch5:   java-1.6.0-openjdk-sparc-fixes.patch
 Patch6:   java-1.6.0-openjdk-sparc-hotspot.patch
-Patch7:   java-1.6.0-openjdk-x11.patch
 
 # (cabral) removed patches
 # Patch2:   java-1.6.0-openjdk-makefile.patch
@@ -189,8 +188,6 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
 Patch109:   icedtea6-1.5-use-libjpeg7.patch
-# (cabral) changes xshmproto.h to XShm.h since there is no header spliting yet
-Patch110:  x11-proto-devel-header.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -447,8 +444,6 @@ make patch
 # patch -l -p0 < %{PATCH3}
 patch -l -p0 < %{PATCH4}
 patch -l -p0 < %{PATCH6}
-patch -l -p0 < %{PATCH7}
-patch -l -p0 < %{PATCH110}
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
