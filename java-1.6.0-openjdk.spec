@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.8
+Release: %mkrel 0.20.%{openjdkver}.9
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -188,6 +188,10 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
 Patch109:   icedtea6-1.5-use-libjpeg7.patch
+
+# corrects #53803 - firefox spinning at 100% cpu in ix86 when loading
+# jmol plugin or visiting http://www.java.com/en/download/help/testvm.xml
+Patch110:   java-1.6.0-openjdk-jmol-plugin.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -407,6 +411,7 @@ The OpenJDK web browser plugin.
 %patch103
 %patch108
 %patch109 -p1
+%patch110 -p1
 
 cp %{SOURCE4} .
 cp %{SOURCE6} .
