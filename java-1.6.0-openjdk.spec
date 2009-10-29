@@ -127,7 +127,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.10
+Release: %mkrel 0.20.%{openjdkver}.11
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -192,6 +192,9 @@ Patch109:   icedtea6-1.5-use-libjpeg7.patch
 # corrects #53803 - firefox spinning at 100% cpu in ix86 when loading
 # jmol plugin or visiting http://www.java.com/en/download/help/testvm.xml
 Patch110:   java-1.6.0-openjdk-jmol-plugin.patch
+
+# corrects #55005 - "unpleasant" bitmap scaled fonts
+Patch111:   java-1.6.0-openjdk-fontpath.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -275,6 +278,10 @@ Requires(postun): desktop-file-utils
 # java-1.6.0-openjdk replaces java-1.7.0-icedtea.
 Provides: java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
+
+# FIXME fonts-ttf-dejavu-lgc is the default, but currently is not directly
+# available in Mandriva
+Requires: fonts-ttf-dejavu
 
 # Standard JPackage base provides.
 Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
@@ -449,6 +456,7 @@ make patch
 # patch -l -p0 < %{PATCH3}
 patch -l -p0 < %{PATCH4}
 patch -l -p0 < %{PATCH6}
+patch -l -p1 < %{PATCH111}
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
@@ -636,6 +644,8 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
 
 # (Anssi 05/2008) for update-alternatives:
 install -d -m755 %{buildroot}%{syslibdir}/mozilla/plugins
+
+cp -fa %{buildroot}%{_jvmdir}/%{jredir}/lib/fontconfig.properties{.src,}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -910,6 +920,8 @@ exit 0
 %{_mandir}/man1/unpack200-%{name}.1*
 %{_datadir}/pixmaps/javaws.png
 %{_datadir}/applications/javaws.desktop
+# FIXME: This should be %config
+%{_jvmdir}/%{jredir}/lib/fontconfig.properties
 
 %files devel
 %defattr(-,root,root,-)
