@@ -196,6 +196,9 @@ Patch110:   java-1.6.0-openjdk-jmol-plugin.patch
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
 
+# (oe) Use libjpeg 8 instead of libjpeg 6.2
+Patch112:   icedtea6-1.5-use-libjpeg8.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -417,8 +420,18 @@ The OpenJDK web browser plugin.
 %patch5 -p1
 %patch103
 %patch108
+
+%if %mdkversion == 201000
+# (teuf) Use libjpeg 7 instead of libjpeg 6.2
 %patch109 -p1
+%endif
+
 %patch110 -p1
+
+%if %mdkversion >= 201010
+# (oe) Use libjpeg 8 instead of libjpeg 6.2
+%patch112 -p1
+%endif
 
 cp %{SOURCE4} .
 cp %{SOURCE6} .
