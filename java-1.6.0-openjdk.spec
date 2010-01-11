@@ -433,6 +433,11 @@ The OpenJDK web browser plugin.
 %patch112 -p1
 %endif
 
+# (oe) instead of a patch
+%if %mdkversion > 200910
+perl -pi -e "s|libxul-unstable|libxul|g" configure*
+%endif
+
 cp %{SOURCE4} .
 cp %{SOURCE6} .
 cp %{SOURCE8} .
