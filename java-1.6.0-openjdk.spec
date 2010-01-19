@@ -13,6 +13,8 @@
 %define openjdkver b16
 %define openjdkdate 24_apr_2009
 
+%define enable_npplugin		1
+
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
 # cabral (fhimpe) we already use java-acess-bridge in Mandriva
@@ -34,6 +36,12 @@
 %define multilib_arches ppc64 sparc64 x86_64
 
 %define jit_arches %{ix86} x86_64 sparcv9 sparc64
+
+%if  %{enable_npplugin}
+  %define plugin_name	IcedTeaNPPlugin.so
+%else
+  %define plugin_name	IcedTeaPlugin.so
+%endif
 
 %ifarch %{ix86}
 %define archbuild i586
@@ -198,6 +206,9 @@ Patch111:   java-1.6.0-openjdk-fontpath.patch
 
 # (oe) Use libjpeg 8 instead of libjpeg 6.2
 Patch112:   icedtea6-1.5-use-libjpeg8.patch
+
+# diff of plugin code for icedtea-1.7-branchpoint
+Patch113:   icedtea6-8826d5735e2c.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -416,6 +427,9 @@ The OpenJDK web browser plugin.
 %prep
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 5
+
+%patch113 -p1
+
 %patch0
 %patch5 -p1
 %patch103
@@ -462,9 +476,14 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 %endif
   --with-pkgversion=mandriva-%{release}-%{_arch} \
 %if %mdkversion >= 200910
-  --enable-pulse-java
+  --enable-pulse-java \
 %else
-  --disable-pulse-java
+  --disable-pulse-java \
+%endif
+%if %{enable_npplugin}
+  --enable-npplugin
+%else
+  --disable-npplugin
 %endif
 
 %if %{gcjbootstrap}
@@ -632,7 +651,7 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
 # Find JRE files.
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
-  | grep -v IcedTeaPlugin.so \
+  | grep -v %{plugin_name} \
   | sed 's|'$RPM_BUILD_ROOT'||' \
   >> %{name}.files
 # Find demo directories.
@@ -889,7 +908,7 @@ fi
 
 update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
+  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/%{plugin_name} %{priority}
 
 exit 0
 
@@ -897,7 +916,7 @@ exit 0
 if [ $1 -eq 0 ]
 then
   update-alternatives --remove %{javaplugin} \
-    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
+    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/%{plugin_name}
 fi
 
 exit 0
@@ -1014,5 +1033,5 @@ exit 0
 %doc README.plugin
 %dir %{syslibdir}/mozilla
 %dir %{syslibdir}/mozilla/plugins
-%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
+%{_jvmdir}/%{jredir}/lib/%{archinstall}/%{plugin_name}
 
