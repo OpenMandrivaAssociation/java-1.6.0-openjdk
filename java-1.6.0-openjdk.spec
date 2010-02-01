@@ -135,7 +135,7 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.13
+Release: %mkrel 0.20.%{openjdkver}.14
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -192,8 +192,6 @@ Patch6:   java-1.6.0-openjdk-sparc-hotspot.patch
 # Mandriva patches
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch103:   icedtea6-1.2-javaws-desktop.patch
-# (fwang) Use our own CJK ttf path when mapping
-Patch108:   icedtea6-1.4.1-mandriva-fontpath.patch
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
 Patch109:   icedtea6-1.5-use-libjpeg7.patch
 
@@ -433,7 +431,6 @@ The OpenJDK web browser plugin.
 %patch0
 %patch5 -p1
 %patch103
-%patch108
 
 %if %mdkversion == 201000
 # (teuf) Use libjpeg 7 instead of libjpeg 6.2
@@ -494,6 +491,7 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p0 < %{PATCH6}
 patch -l -p1 < %{PATCH111}
+
 make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
