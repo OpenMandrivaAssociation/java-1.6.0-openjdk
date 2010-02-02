@@ -8,12 +8,10 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.6
+%define icedteaver 1.7
 %define icedteasnapshot %{nil}
-%define openjdkver b16
-%define openjdkdate 24_apr_2009
-
-%define enable_npplugin		1
+%define openjdkver b17
+%define openjdkdate 14_oct_2009
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
@@ -23,25 +21,19 @@
 # define accessver %{accessmajorver}.%{accessminorver}
 # define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
-%define visualvmurl https://visualvm.dev.java.net/files/documents/7163/127067/
+%define visualvmurl https://visualvm.dev.java.net/files/documents/7163/127170/
 %define netbeansurl http://icedtea.classpath.org/visualvm/
 %define hotspoturl  http://hg.openjdk.java.net/jdk7/hotspot/hotspot/archive/
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.bz2
+%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}.tar.gz
 
 %define mauvedate 2008-10-22
 
 %define multilib_arches ppc64 sparc64 x86_64
 
 %define jit_arches %{ix86} x86_64 sparcv9 sparc64
-
-%if  %{enable_npplugin}
-  %define plugin_name	IcedTeaNPPlugin.so
-%else
-  %define plugin_name	IcedTeaPlugin.so
-%endif
 
 %ifarch %{ix86}
 %define archbuild i586
@@ -75,11 +67,13 @@
 %define buildoutputdir openjdk/build/linux-%{archbuild}
 
 %if %{gcjbootstrap}
-%define icedteaopt --with-java=%{_jvmdir}/java-gcj/bin/java --with-ecj=%{_jvmdir}/java-gcj/bin/javac --with-javah=%{_jvmdir}/java-gcj/bin/javah --with-jar=%{_jvmdir}/java-gcj/bin/jar --with-rmic=%{_jvmdir}/java-gcj/bin/rmic --with-libgcj-jar=%{_jvmdir}/jre-gcj/lib/rt.jar
-%define gcc_version 4.3
+  %define icedteaopt %{nil}
 %else
-%define icedteaopt --with-openjdk
-%define gcc_version %{nil}
+  %ifarch %{jit_arches}
+    %define icedteaopt --with-openjdk --enable-systemtap --enable-npplugin
+  %else
+    %define icedteaopt --with-openjdk
+  %endif
 %endif
 
 # Convert an absolute path to a relative path.  Each symbolic link is
@@ -91,14 +85,14 @@
 # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
 # simply be another alternative.
 %ifarch %{multilib_arches}
-%define syslibdir       %{_prefix}/lib64
-%define _libdir         %{_prefix}/lib
-%define archname        %{name}.%{_arch}
-%define javaplugin      libjavaplugin.so.%{_arch}
+  %define syslibdir	%{_prefix}/lib64
+  %define _libdir	%{_prefix}/lib
+  %define archname	%{name}.%{_arch}
+  %define javaplugin	libjavaplugin.so.%{_arch}
 %else
-%define syslibdir       %{_libdir}
-%define archname        %{name}
-%define javaplugin      libjavaplugin.so
+  %define syslibdir	%{_libdir}
+  %define archname	%{name}
+  %define javaplugin	libjavaplugin.so
 %endif
 
 # Standard JPackage naming and versioning defines.
@@ -110,32 +104,45 @@
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
 %ifarch %{multilib_arches}
-%define sdklnk          java-%{javaver}-%{origin}.%{_arch}
-%define jrelnk          jre-%{javaver}-%{origin}.%{_arch}
-%define sdkdir          %{name}-%{version}.%{_arch}
+  %define sdklnk	java-%{javaver}-%{origin}.%{_arch}
+  %define jrelnk	jre-%{javaver}-%{origin}.%{_arch}
+  %define sdkdir	%{name}-%{version}.%{_arch}
 %else
-%define sdklnk          java-%{javaver}-%{origin}
-%define jrelnk          jre-%{javaver}-%{origin}
-%define sdkdir          %{name}-%{version}
+  %define sdklnk	java-%{javaver}-%{origin}
+  %define jrelnk	jre-%{javaver}-%{origin}
+  %define sdkdir	%{name}-%{version}
 %endif
 %define jredir          %{sdkdir}/jre
 %define sdkbindir       %{_jvmdir}/%{sdklnk}/bin
 %define jrebindir       %{_jvmdir}/%{jrelnk}/bin
 %ifarch %{multilib_arches}
-%define jvmjardir       %{_jvmjardir}/%{name}-%{version}.%{_arch}
+  %define jvmjardir	%{_jvmjardir}/%{name}-%{version}.%{_arch}
 %else
-%define jvmjardir       %{_jvmjardir}/%{name}-%{version}
+  %define jvmjardir	%{_jvmjardir}/%{name}-%{version}
 %endif
 
+%ifarch %{jit_arches}
+# Where to install systemtap tapset (links)
+# We would like these to be in a package specific subdir,
+# but currently systemtap doesn't support that, so we have to
+# use the root tapset dir for now. To distinquish between 64
+# and 32 bit architectures we place the tapsets under the arch
+# specific dir (note that systemtap will only pickup the tapset
+# for the primary arch for now). Systemtap uses the machine name
+# aka build_cpu as architecture specific directory name.
+#%#define tapsetdir /usr/share/systemtap/tapset/%{sdkdir}
+  %define tapsetdir /usr/share/systemtap/tapset/%{_build_cpu}
+%endif 
+
 # Prevent brp-java-repack-jars from being run.
-%define __jar_repack 0
+%define __jar_repack	0
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.14
+Release: %mkrel 0.20.%{openjdkver}.1
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -154,6 +161,7 @@ License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 # hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
 Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+
 # Fedora sources
 Source1:  %{fedorazip}
 # (fhimpe) Disabled: we use system java-access-bridge in Mandriva
@@ -162,12 +170,8 @@ Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  mauve-%{mauvedate}.tar.gz
 Source6:  mauve_tests
-Source7: %{hotspoturl}/hotspot.tar.gz
-Source8: %{netbeansurl}/netbeans-profiler-visualvm_release65_mod.tar.gz
-Source9: %{visualvmurl}/visualvm-11-src.tar.gz
-
-# Mandriva sources
-Source100: README.plugin
+Source7: %{netbeansurl}/netbeans-profiler-visualvm_release65_mod.tar.gz
+Source8: %{visualvmurl}/visualvm-111-src.tar.gz
 
 # Fedora patches
 # FIXME: This patch needs to be fixed. optflags argument
@@ -181,8 +185,6 @@ Patch0:   java-1.6.0-openjdk-optflags.patch
 # Patch2:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
 # Patch3:   java-1.6.0-openjdk-java-access-bridge-security.patch
 Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
-Patch5:   java-1.6.0-openjdk-sparc-fixes.patch
-Patch6:   java-1.6.0-openjdk-sparc-hotspot.patch
 
 # (cabral) removed patches
 # Patch2:   java-1.6.0-openjdk-makefile.patch
@@ -192,21 +194,9 @@ Patch6:   java-1.6.0-openjdk-sparc-hotspot.patch
 # Mandriva patches
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
 Patch103:   icedtea6-1.2-javaws-desktop.patch
-# (teuf) Use libjpeg 7 instead of libjpeg 6.2
-Patch109:   icedtea6-1.5-use-libjpeg7.patch
-
-# corrects #53803 - firefox spinning at 100% cpu in ix86 when loading
-# jmol plugin or visiting http://www.java.com/en/download/help/testvm.xml
-Patch110:   java-1.6.0-openjdk-jmol-plugin.patch
 
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
-
-# (oe) Use libjpeg 8 instead of libjpeg 6.2
-Patch112:   icedtea6-1.5-use-libjpeg8.patch
-
-# diff of plugin code for icedtea-1.7-branchpoint
-Patch113:   icedtea6-8826d5735e2c.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -230,6 +220,11 @@ BuildRequires: ant
 BuildRequires: libxinerama-devel
 BuildRequires: rhino
 BuildRequires: zip
+
+%ifarch %{jit_arches}
+BuildRequires:	systemtap
+%endif
+
 %if %{gcjbootstrap}
 BuildRequires: java-1.5.0-gcj-devel
 %else
@@ -426,23 +421,8 @@ The OpenJDK web browser plugin.
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 5
 
-%patch113 -p1
-
 %patch0
-%patch5 -p1
 %patch103
-
-%if %mdkversion == 201000
-# (teuf) Use libjpeg 7 instead of libjpeg 6.2
-%patch109 -p1
-%endif
-
-%patch110 -p1
-
-%if %mdkversion >= 201010
-# (oe) Use libjpeg 8 instead of libjpeg 6.2
-%patch112 -p1
-%endif
 
 # (oe) instead of a patch
 %if %mdkversion > 200910
@@ -451,21 +431,24 @@ perl -pi -e "s|libxul-unstable|libxul|g" configure*
 
 cp %{SOURCE4} .
 cp %{SOURCE6} .
-cp %{SOURCE8} .
 cp %{SOURCE7} .
-cp %{SOURCE9} .
-cp %{SOURCE100} . 
+cp %{SOURCE8} .
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
 %{_bindir}/autoreconf -i -v -f
 ./autogen.sh
 
 %build
+%ifarch sparc64 alpha
+  export ARCH_DATA_MODEL=64
+%endif
+%ifarch alpha
+  export CFLAGS="$CFLAGS -mieee"
+%endif
 # Build IcedTea and OpenJDK.
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 export CFLAGS="%{optflags} -fno-tree-vrp"
 %{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
-  --with-hotspot-src-zip=%{SOURCE7} \
 %if %with visualvm
   --enable-visualvm \
 %else
@@ -477,19 +460,12 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 %else
   --disable-pulse-java \
 %endif
-%if %{enable_npplugin}
-  --enable-npplugin
-%else
-  --disable-npplugin
-%endif
 
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
 make patch
-# patch -l -p0 < %{PATCH3}
 patch -l -p0 < %{PATCH4}
-patch -l -p0 < %{PATCH6}
 patch -l -p1 < %{PATCH111}
 
 make STATIC_CXX=false
@@ -544,6 +520,16 @@ pushd %{buildoutputdir}/j2sdk-image
   cp -a bin include lib src.zip $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
   install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
   cp -a jre/bin jre/lib $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
+
+%ifarch %{jit_arches}
+  # Install systemtap support files.
+  cp -a tapset $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
+  install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
+  pushd $RPM_BUILD_ROOT%{tapsetdir}
+  RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
+  ln -sf $RELATIVE/*.stp .
+  popd
+%endif
 
   # Install cacerts symlink.
   rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
@@ -649,7 +635,7 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
 # Find JRE files.
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
-  | grep -v %{plugin_name} \
+  | grep -v IcedTeaNPPlugin.so \
   | sed 's|'$RPM_BUILD_ROOT'||' \
   >> %{name}.files
 # Find demo directories.
@@ -906,7 +892,7 @@ fi
 
 update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/%{plugin_name} %{priority}
+  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so %{priority}
 
 exit 0
 
@@ -914,7 +900,7 @@ exit 0
 if [ $1 -eq 0 ]
 then
   update-alternatives --remove %{javaplugin} \
-    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/%{plugin_name}
+    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so
 fi
 
 exit 0
@@ -923,7 +909,6 @@ exit 0
 %defattr(-,root,root,-)
 %doc %{buildoutputdir}/j2sdk-image/jre/ASSEMBLY_EXCEPTION
 %doc %{buildoutputdir}/j2sdk-image/jre/LICENSE
-%doc %{buildoutputdir}/j2sdk-image/jre/README.html
 %doc %{buildoutputdir}/j2sdk-image/jre/THIRD_PARTY_README
 # FIXME: The TRADEMARK file should be in j2sdk-image.
 %doc openjdk/TRADEMARK
@@ -963,7 +948,6 @@ exit 0
 %doc ChangeLog
 %doc %{buildoutputdir}/j2sdk-image/ASSEMBLY_EXCEPTION
 %doc %{buildoutputdir}/j2sdk-image/LICENSE
-%doc %{buildoutputdir}/j2sdk-image/README.html
 %doc %{buildoutputdir}/j2sdk-image/THIRD_PARTY_README
 # FIXME: The TRADEMARK file should be in j2sdk-image.
 %doc openjdk/TRADEMARK
@@ -1007,6 +991,12 @@ exit 0
 %if %with visualvm
 %{_datadir}/applications/visualvm.desktop
 %endif
+%ifarch %{jit_arches}
+  %dir %{_jvmdir}/%{sdkdir}/tapset
+  %{_jvmdir}/%{sdkdir}/tapset/*
+  %dir %{tapsetdir}
+  %{tapsetdir}/*.stp
+%endif
 
 %files demo -f %{name}-demo.files
 %defattr(-,root,root,-)
@@ -1028,8 +1018,7 @@ exit 0
 
 %files plugin
 %defattr(-,root,root,-)
-%doc README.plugin
 %dir %{syslibdir}/mozilla
 %dir %{syslibdir}/mozilla/plugins
-%{_jvmdir}/%{jredir}/lib/%{archinstall}/%{plugin_name}
+%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaNPPlugin.so
 
