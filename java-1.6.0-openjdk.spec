@@ -131,7 +131,7 @@
 # for the primary arch for now). Systemtap uses the machine name
 # aka build_cpu as architecture specific directory name.
 #%#define tapsetdir /usr/share/systemtap/tapset/%{sdkdir}
-  %define tapsetdir /usr/share/systemtap/tapset/%{_build_cpu}
+  %define tapsetdir %{_datadir}/systemtap/tapset/%{_build_cpu}
 %endif 
 
 # Prevent brp-java-repack-jars from being run.
