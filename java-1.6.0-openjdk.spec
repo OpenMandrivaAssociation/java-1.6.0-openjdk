@@ -1,5 +1,7 @@
 %bcond_with visualvm
 
+%define with_systemtap	0
+
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
@@ -34,6 +36,14 @@
 %define multilib_arches ppc64 sparc64 x86_64
 
 %define jit_arches %{ix86} x86_64 sparcv9 sparc64
+
+%ifarch %{jit_arches}
+  %if %{with_systemtap}
+    %define systemtapopt	--enable-systemtap
+  %else
+    %define systemtapopt	--disable-systemtap
+  %endif
+%endif
 
 %ifarch %{ix86}
 %define archbuild i586
@@ -70,7 +80,7 @@
   %define icedteaopt %{nil}
 %else
   %ifarch %{jit_arches}
-    %define icedteaopt --with-openjdk --enable-systemtap --enable-npplugin
+    %define icedteaopt --with-openjdk %{systemtapopt} --enable-npplugin
   %else
     %define icedteaopt --with-openjdk
   %endif
@@ -122,6 +132,7 @@
 %endif
 
 %ifarch %{jit_arches}
+  %if %{with_systemtap}
 # Where to install systemtap tapset (links)
 # We would like these to be in a package specific subdir,
 # but currently systemtap doesn't support that, so we have to
@@ -131,7 +142,8 @@
 # for the primary arch for now). Systemtap uses the machine name
 # aka build_cpu as architecture specific directory name.
 #%#define tapsetdir /usr/share/systemtap/tapset/%{sdkdir}
-  %define tapsetdir %{_datadir}/systemtap/tapset/%{_build_cpu}
+    %define tapsetdir %{_datadir}/systemtap/tapset/%{_build_cpu}
+  %endif
 %endif 
 
 # Prevent brp-java-repack-jars from being run.
@@ -222,7 +234,9 @@ BuildRequires: rhino
 BuildRequires: zip
 
 %ifarch %{jit_arches}
+  %if %{with_systemtap}
 BuildRequires:	systemtap
+  %endif
 %endif
 
 %if %{gcjbootstrap}
@@ -522,13 +536,15 @@ pushd %{buildoutputdir}/j2sdk-image
   cp -a jre/bin jre/lib $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
 
 %ifarch %{jit_arches}
-  # Install systemtap support files.
-  cp -a tapset $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
-  pushd $RPM_BUILD_ROOT%{tapsetdir}
-  RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
-  ln -sf $RELATIVE/*.stp .
-  popd
+  %if %{with_systemtap}
+    # Install systemtap support files.
+    cp -a tapset $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
+    install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
+    pushd $RPM_BUILD_ROOT%{tapsetdir}
+      RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
+      ln -sf $RELATIVE/*.stp .
+    popd
+  %endif
 %endif
 
   # Install cacerts symlink.
@@ -992,10 +1008,12 @@ exit 0
 %{_datadir}/applications/visualvm.desktop
 %endif
 %ifarch %{jit_arches}
-  %dir %{_jvmdir}/%{sdkdir}/tapset
-  %{_jvmdir}/%{sdkdir}/tapset/*
-  %dir %{tapsetdir}
-  %{tapsetdir}/*.stp
+  %if %{with_systemtap}
+    %dir %{_jvmdir}/%{sdkdir}/tapset
+    %{_jvmdir}/%{sdkdir}/tapset/*
+    %dir %{tapsetdir}
+    %{tapsetdir}/*.stp
+  %endif
 %endif
 
 %files demo -f %{name}-demo.files
