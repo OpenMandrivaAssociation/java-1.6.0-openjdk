@@ -485,7 +485,7 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
 
-make STATIC_CXX=false ANT_OPTIONS='-lib %{_datadir}/java/ant'
+make STATIC_CXX=false ANT='ant -lib %{_datadir}/java/ant'
 
 touch mauve-%{mauvedate}/mauve_output
 
