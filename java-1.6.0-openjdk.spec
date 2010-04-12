@@ -10,10 +10,10 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.7
+%define icedteaver 1.8
 %define icedteasnapshot %{nil}
-%define openjdkver b17
-%define openjdkdate 14_oct_2009
+%define openjdkver b18
+%define openjdkdate 16_feb_2010
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
@@ -154,7 +154,8 @@ Version: %{javaver}.%{buildver}
 %if %mdkversion < 200910
 %define subrel  1
 %endif
-Release: %mkrel 0.20.%{openjdkver}.2
+
+Release: %mkrel 1.%{openjdkver}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -172,6 +173,9 @@ Group:   Development/Java
 License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 # hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
+
+# FIXME
+# Note: file not yet available - tarball generated from hg icedtea6-1.8-branch
 Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 
 # Fedora sources
@@ -213,6 +217,7 @@ Patch111:   java-1.6.0-openjdk-fontpath.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
+BuildRequires:	ant-apache-regexp
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
@@ -480,7 +485,7 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
 
-make STATIC_CXX=false
+make STATIC_CXX=false ANT_OPTIONS='-lib %{_datadir}/java/ant'
 
 touch mauve-%{mauvedate}/mauve_output
 
