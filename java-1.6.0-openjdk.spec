@@ -29,7 +29,7 @@
 
 %define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}.tar.gz
+%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
 
 %define mauvedate 2008-10-22
 
@@ -80,7 +80,7 @@
   %define icedteaopt %{nil}
 %else
   %ifarch %{jit_arches}
-    %define icedteaopt --with-openjdk %{systemtapopt} --enable-npplugin
+    %define icedteaopt --with-openjdk %{systemtapopt}
   %else
     %define icedteaopt --with-openjdk
   %endif
@@ -213,6 +213,9 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
+
+# need an extra argument to find the jar files...
+Patch112:	icedtea6-1.8-ant-apache-regexp.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -484,8 +487,9 @@ make stamps/patch-ecj.stamp
 make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
+patch -l -p1 < %{PATCH112}
 
-make STATIC_CXX=false ANT='ant -lib %{_datadir}/java/ant'
+make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
 
