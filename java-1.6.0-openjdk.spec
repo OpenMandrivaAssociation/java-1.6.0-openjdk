@@ -174,8 +174,6 @@ License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
 # hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
 
-# FIXME
-# Note: file not yet available - tarball generated from hg icedtea6-1.8-branch
 Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 
 # Fedora sources
@@ -188,6 +186,15 @@ Source5:  mauve-%{mauvedate}.tar.gz
 Source6:  mauve_tests
 Source7: %{netbeansurl}/netbeans-profiler-visualvm_release65_mod.tar.gz
 Source8: %{visualvmurl}/visualvm-111-src.tar.gz
+
+# wget https://jaxp.dev.java.net/files/documents/913/147329/jdk6-jaxp-2009_10_13.zip
+Source9:	jdk6-jaxp-2009_10_13.zip
+
+# wget http://kenai.com/projects/jdk6-drops/downloads/download/jdk6-jaxws-2009_10_27.zip
+Source10:	jdk6-jaxws-2009_10_27.zip
+
+# wget http://kenai.com/downloads/jdk6-drops/jdk6-jaf-2009_10_27.zip
+Source11:	jdk6-jaf-2009_10_27.zip
 
 # Fedora patches
 # FIXME: This patch needs to be fixed. optflags argument
@@ -213,6 +220,8 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
+
+Patch112:   icedtea6-1.8-ant-apache-regexp.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -477,6 +486,9 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 %else
   --disable-pulse-java \
 %endif
+  --with-jaxp-drop-zip=%{SOURCE9} \
+  --with-jaxws-drop-zip=%{SOURCE10} \
+  --with-jaf-drop-zip=%{SOURCE11}
 
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
@@ -484,6 +496,7 @@ make stamps/patch-ecj.stamp
 make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
+patch -l -p1 < %{PATCH112}
 
 make STATIC_CXX=false
 
@@ -654,7 +667,7 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
 # Find JRE files.
 find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
-  | grep -v IcedTeaNPPlugin.so \
+  | grep -v IcedTeaPlugin.so \
   | sed 's|'$RPM_BUILD_ROOT'||' \
   >> %{name}.files
 # Find demo directories.
@@ -911,7 +924,7 @@ fi
 
 update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so %{priority}
+  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
 
 exit 0
 
@@ -919,7 +932,7 @@ exit 0
 if [ $1 -eq 0 ]
 then
   update-alternatives --remove %{javaplugin} \
-    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so
+    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
 fi
 
 exit 0
@@ -1041,5 +1054,5 @@ exit 0
 %defattr(-,root,root,-)
 %dir %{syslibdir}/mozilla
 %dir %{syslibdir}/mozilla/plugins
-%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaNPPlugin.so
+%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
 
