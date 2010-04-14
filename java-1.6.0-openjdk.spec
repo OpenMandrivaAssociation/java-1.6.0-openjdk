@@ -8,7 +8,7 @@
 %define gcjbootstrap 0
 
 # If runtests is 0 test suites will not be run.
-%define runtests 0
+%define runtests 1
 
 %define icedteaver 1.8
 %define icedteasnapshot %{nil}
@@ -926,6 +926,8 @@ update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
   %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
 
+update-alternatives --config %{javaplugin}
+
 exit 0
 
 %postun plugin
@@ -958,6 +960,7 @@ exit 0
 # FIXME: These should be replaced by symlinks into /etc.
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %{_datadir}/applications/*policytool.desktop
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
