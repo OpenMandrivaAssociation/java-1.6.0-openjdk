@@ -8,7 +8,7 @@
 %define gcjbootstrap 0
 
 # If runtests is 0 test suites will not be run.
-%define runtests 1
+%define runtests 0
 
 %define icedteaver 1.8
 %define icedteasnapshot %{nil}
@@ -231,7 +231,11 @@ Patch112:   icedtea6-1.8-ant-apache-regexp.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
-BuildRequires:	ant-apache-regexp
+
+# Patch112 actually makes it not required as it doesn't build; needs
+# ant-1.8.0 and/or bootstrap with an openjdk newer then icedtea6-1.7.0
+#BuildRequires:	ant-apache-regexp
+
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
@@ -930,8 +934,6 @@ fi
 update-alternatives\
   --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
   %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
-
-update-alternatives --config %{javaplugin}
 
 exit 0
 
