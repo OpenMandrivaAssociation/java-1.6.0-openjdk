@@ -149,13 +149,18 @@
 # Prevent brp-java-repack-jars from being run.
 %define __jar_repack	0
 
-Name:    java-%{javaver}-%{origin}
-Version: %{javaver}.%{buildver}
-%if %mdkversion < 200910
-%define subrel  1
+%if %mandriva_branch == Cooker
+# Cooker
+%define release %mkrel 1.%{openjdkver}
+%else
+# Old distros
+%define subrel 1
+%define release %mkrel 0.%{openjdkver}
 %endif
 
-Release: %mkrel 1.%{openjdkver}
+Name:    java-%{javaver}-%{origin}
+Version: %{javaver}.%{buildver}
+Release: %{release}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
