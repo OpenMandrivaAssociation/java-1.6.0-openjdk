@@ -226,16 +226,11 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
 
-Patch112:   icedtea6-1.8-ant-apache-regexp.patch
-
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
 
-# Patch112 actually makes it not required as it doesn't build; needs
-# ant-1.8.0 and/or bootstrap with an openjdk newer then icedtea6-1.7.0
-#BuildRequires:	ant-apache-regexp
-
+BuildRequires:	ant-nodeps
 BuildRequires: cups-devel
 BuildRequires: desktop-file-utils
 BuildRequires: ungif-devel
@@ -505,7 +500,6 @@ make stamps/patch-ecj.stamp
 make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
-patch -l -p1 < %{PATCH112}
 
 make STATIC_CXX=false
 
