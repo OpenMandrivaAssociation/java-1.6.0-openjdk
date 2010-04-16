@@ -151,11 +151,11 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 1.%{openjdkver}
+%define release %mkrel 2.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
-%define release %mkrel 0.%{openjdkver}
+%define release %mkrel 1.%{openjdkver}
 %endif
 
 Name:    java-%{javaver}-%{origin}
