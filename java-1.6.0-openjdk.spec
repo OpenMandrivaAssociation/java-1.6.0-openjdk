@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 2.%{openjdkver}
+%define release %mkrel 3.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -225,6 +225,8 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
+
+Patch112:	icedtea6-1.8-environment.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -453,6 +455,7 @@ The OpenJDK web browser plugin.
 
 %patch0
 %patch103
+%patch112 -p1
 
 # (oe) instead of a patch
 %if %mdkversion > 200910
