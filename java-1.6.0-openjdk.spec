@@ -154,8 +154,8 @@
 %define release %mkrel 3.%{openjdkver}
 %else
 # Old distros
-%define subrel 2
-%define release %mkrel 1.%{openjdkver}
+%define subrel 1
+%define release %mkrel 2.%{openjdkver}
 %endif
 
 Name:    java-%{javaver}-%{origin}
