@@ -154,7 +154,7 @@
 %define release %mkrel 3.%{openjdkver}
 %else
 # Old distros
-%define subrel 1
+%define subrel 2
 %define release %mkrel 1.%{openjdkver}
 %endif
 
