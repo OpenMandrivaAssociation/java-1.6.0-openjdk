@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 3.%{openjdkver}
+%define release %mkrel 4.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -278,9 +278,6 @@ BuildRequires: java-access-bridge
 BuildRequires: glib2-devel
 BuildRequires: gtk2-devel
 BuildRequires: xulrunner-devel
-%if %mdkversion < 200910
-BuildRequires: xulrunner-devel-unstable
-%endif
 %if %mdkversion >= 200910
 # PulseAudio build requirements.
 BuildRequires: pulseaudio-devel >= 0.9.11
@@ -458,9 +455,7 @@ The OpenJDK web browser plugin.
 %patch112 -p1
 
 # (oe) instead of a patch
-%if %mdkversion > 200910
 perl -pi -e "s|libxul-unstable|libxul|g" configure*
-%endif
 
 cp %{SOURCE4} .
 cp %{SOURCE6} .
