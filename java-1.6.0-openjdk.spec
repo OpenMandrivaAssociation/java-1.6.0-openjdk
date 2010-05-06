@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 4.%{openjdkver}
+%define release %mkrel 5.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -921,6 +921,11 @@ if [ $1 -gt 1 ]
 then
   update-alternatives --remove %{javaplugin} \
     %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
+fi
+
+if [ -f %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so ]; then
+    update-alternatives --remove %{javaplugin} \
+	%{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so
 fi
 
 update-alternatives\
