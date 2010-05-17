@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 5.%{openjdkver}
+%define release %mkrel 6.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -499,7 +499,7 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
 
-make STATIC_CXX=false
+make STATIC_CXX=false MOZILLA_LIBS=""
 
 touch mauve-%{mauvedate}/mauve_output
 
