@@ -10,7 +10,7 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.8
+%define icedteaver 1.8.1
 %define icedteasnapshot %{nil}
 %define openjdkver b18
 %define openjdkdate 16_feb_2010
@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 6.%{openjdkver}
+%define release %mkrel 7.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -225,8 +225,6 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
-
-Patch112:	icedtea6-1.8-environment.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
@@ -452,7 +450,6 @@ The OpenJDK web browser plugin.
 
 %patch0
 %patch103
-%patch112 -p1
 
 # (oe) instead of a patch
 perl -pi -e "s|libxul-unstable|libxul|g" configure*
