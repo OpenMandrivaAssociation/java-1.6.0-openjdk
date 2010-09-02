@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 7.%{openjdkver}
+%define release %mkrel 8.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
@@ -405,6 +405,7 @@ The OpenJDK source bundle.
 %package javadoc
 Summary: OpenJDK API Documentation
 Group:   Development/Java
+BuildArch: noarch
 
 # Post requires alternatives to install javadoc alternative.
 Requires(post):   update-alternatives
