@@ -10,7 +10,7 @@
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.8.1
+%define icedteaver 1.8.2
 %define icedteasnapshot %{nil}
 %define openjdkver b18
 %define openjdkdate 16_feb_2010
@@ -151,7 +151,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 9.%{openjdkver}
+%define release %mkrel 10.%{openjdkver}
 %else
 # Old distros
 %define subrel 1
