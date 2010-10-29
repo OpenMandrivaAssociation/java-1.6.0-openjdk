@@ -226,6 +226,9 @@ Patch103:   icedtea6-1.2-javaws-desktop.patch
 # corrects #55005 - "unpleasant" bitmap scaled fonts
 Patch111:   java-1.6.0-openjdk-fontpath.patch
 
+# this should be a temporary patch and corrects some clear errors
+Patch112:	icedtea6-1.8.2-mutex_and_leak.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: alsa-lib-devel
@@ -498,6 +501,7 @@ make stamps/patch-ecj.stamp
 make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
+patch -l -p1 < %{PATCH112}
 
 make STATIC_CXX=false MOZILLA_LIBS=""
 
