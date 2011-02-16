@@ -244,8 +244,6 @@ BuildRequires:	systemtap
 %endif
 
 %if %{gcjbootstrap}
-# FIXME -devel should be enough
-BuildRequires: java-1.5.0-gcj
 BuildRequires: java-1.5.0-gcj-devel
 %else
 BuildRequires: java-1.6.0-openjdk-devel
@@ -455,9 +453,6 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
   --enable-pulse-java \
 %else
   --disable-pulse-java \
-%endif
-%if %{gcjbootstrap}
-  --with-gcj-home=%_jvmdir/java-1.5.0-gcj-1.5.0.0 \
 %endif
   -with-hotspot-build=hs19 --with-hotspot-src-zip=%{SOURCE7} \
   --with-jaf-drop-zip=%{SOURCE9} \
