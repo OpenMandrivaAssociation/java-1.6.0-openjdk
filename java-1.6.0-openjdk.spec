@@ -73,7 +73,7 @@
 %define runtests 0
 %endif
 
-%define buildoutputdir openjdk/build
+%define buildoutputdir openjdk.build
 
 %if %{gcjbootstrap}
   %define icedteaopt %{nil}
