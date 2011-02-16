@@ -1,19 +1,17 @@
-%bcond_with visualvm
-
 %define with_systemtap	0
 
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 0
+%define gcjbootstrap 1
 
 # If runtests is 0 test suites will not be run.
 %define runtests 0
 
-%define icedteaver 1.8.6
+%define icedteaver 1.9.7
 %define icedteasnapshot %{nil}
-%define openjdkver b18
-%define openjdkdate 16_feb_2010
+%define openjdkver b20
+%define openjdkdate 21_jun_2010
 
 %define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
 
@@ -23,11 +21,12 @@
 # define accessver %{accessmajorver}.%{accessminorver}
 # define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
-%define visualvmurl https://visualvm.dev.java.net/files/documents/7163/127170/
-%define netbeansurl http://icedtea.classpath.org/visualvm/
-%define hotspoturl  http://hg.openjdk.java.net/jdk7/hotspot/hotspot/archive/
+%define hotspoturl http://hg.openjdk.java.net/hsx/hsx19/master/archive/
+%define jaxpurl     https://jaxp.dev.java.net/files/documents/913/150648/
+%define jafurl      https://jax-ws.dev.java.net/files/documents/4202/150725/
+%define jaxwsurl    https://jax-ws.dev.java.net/files/documents/4202/150724/
 
-%define openjdkurlbase http://www.java.net/download/openjdk/jdk7/promoted/
+%define openjdkurlbase http://www.java.net/download/openjdk/jdk6/promoted/
 %define openjdkurl %{openjdkurlbase}%{openjdkver}/
 %define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
 
@@ -74,7 +73,7 @@
 %define runtests 0
 %endif
 
-%define buildoutputdir openjdk/build/linux-%{archbuild}
+%define buildoutputdir openjdk/build
 
 %if %{gcjbootstrap}
   %define icedteaopt %{nil}
@@ -151,11 +150,11 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 13.%{openjdkver}
+%define release %mkrel 14.%{openjdkver}
 %else
 # Old distros
-%define subrel 1
-%define release %mkrel 2.%{openjdkver}
+%define subrel 4
+%define release %mkrel 6.%{openjdkver}
 %endif
 
 Name:    java-%{javaver}-%{origin}
@@ -177,30 +176,19 @@ Group:   Development/Java
 
 License:  GPLv2 with exceptions
 URL:      http://icedtea.classpath.org/
-# hg clone http://icedtea.classpath.org/hg/icedtea6 && rm -rf icedtea6/.hg && tar cjf icedtea6.tar.bz2 icedtea6
-
 Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
-
 # Fedora sources
-Source1:  %{fedorazip}
+Source1: %{fedorazip}
 # (fhimpe) Disabled: we use system java-access-bridge in Mandriva
 #Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
 Source3:  %{genurl}generate-fedora-zip.sh
 Source4:  README.src
 Source5:  mauve-%{mauvedate}.tar.gz
 Source6:  mauve_tests
-Source7: %{netbeansurl}/netbeans-profiler-visualvm_release65_mod.tar.gz
-Source8: %{visualvmurl}/visualvm-111-src.tar.gz
-
-# wget https://jaxp.dev.java.net/files/documents/913/147329/jdk6-jaxp-2009_10_13.zip
-Source9:	jdk6-jaxp-2009_10_13.zip
-
-# wget http://kenai.com/projects/jdk6-drops/downloads/download/jdk6-jaxws-2009_10_27.zip
-Source10:	jdk6-jaxws-2009_10_27.zip
-
-# wget http://kenai.com/downloads/jdk6-drops/jdk6-jaf-2009_10_27.zip
-Source11:	jdk6-jaf-2009_10_27.zip
-
+Source7:  %{hotspoturl}13edc857b967.tar.gz
+Source8:  %{jaxpurl}jdk6-jaxp-%{openjdkver}.zip
+Source9:  %{jafurl}jdk6-jaf-%{openjdkver}.zip
+Source10: %{jaxwsurl}jdk6-jaxws-%{openjdkver}.zip
 # Fedora patches
 # FIXME: This patch needs to be fixed. optflags argument
 # -mtune=generic is being ignored because it breaks several graphical
@@ -213,11 +201,6 @@ Patch0:   java-1.6.0-openjdk-optflags.patch
 # Patch2:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
 # Patch3:   java-1.6.0-openjdk-java-access-bridge-security.patch
 Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
-
-# (cabral) removed patches
-# Patch2:   java-1.6.0-openjdk-makefile.patch
-# Patch8:   java-1.6.0-openjdk-netxandplugin.patch (removed)
-# Patch9:   java-1.6.0-openjdk-securitypatches.patch (removed)
 
 # Mandriva patches
 # (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
@@ -261,6 +244,8 @@ BuildRequires:	systemtap
 %endif
 
 %if %{gcjbootstrap}
+# FIXME -devel should be enough
+BuildRequires: java-1.5.0-gcj
 BuildRequires: java-1.5.0-gcj-devel
 %else
 BuildRequires: java-1.6.0-openjdk-devel
@@ -287,11 +272,6 @@ BuildRequires: pulseaudio >= 0.9.11
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires: libffi-devel
-%endif
-%if %with visualvm
-# visualvm build requirements.
-BuildRequires: netbeans-ide
-BuildRequires: jakarta-commons-logging
 %endif
 # Require /etc/pki/java/cacerts.
 Requires: rootcerts-java
@@ -343,10 +323,6 @@ Provides: java-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
-%if %without visualvm
-
-This version is built without netbeans, so jvisualvm is disabled.
-%endif
 
 %package devel
 Summary: OpenJDK Development Environment
@@ -354,10 +330,6 @@ Group:   Development/Java
 
 # Require base package.
 Requires:         %{name} = %{epoch}:%{version}-%{release}
-%if %with visualvm
-# Requirements for jvisualvm
-Requires:         libnb-platform8
-%endif
 # Post requires alternatives to install tool alternatives.
 Requires(post):   update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
@@ -453,17 +425,14 @@ The OpenJDK web browser plugin.
 %prep
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 5
-
+cp %{SOURCE4} .
+cp %{SOURCE6} .
 %patch0
 %patch103
 
 # (oe) instead of a patch
 perl -pi -e "s|libxul-unstable|libxul|g" configure*
 
-cp %{SOURCE4} .
-cp %{SOURCE6} .
-cp %{SOURCE7} .
-cp %{SOURCE8} .
 %{_bindir}/find . -type f -name "*.sh" -o -type f -name "*.cgi" | %{_bindir}/xargs %{__chmod} 0755
 %{_bindir}/autoreconf -i -v -f
 ./autogen.sh
@@ -479,22 +448,21 @@ cp %{SOURCE8} .
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 export CFLAGS="%{optflags} -fno-tree-vrp"
+# FIXME should not need to pass --with-gcj-home
 %{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
-%if %with visualvm
-  --enable-visualvm \
-%else
-  --disable-visualvm \
-%endif
   --with-pkgversion=mandriva-%{release}-%{_arch} \
 %if %mdkversion >= 200910
   --enable-pulse-java \
 %else
   --disable-pulse-java \
 %endif
-  --with-jaxp-drop-zip=%{SOURCE9} \
-  --with-jaxws-drop-zip=%{SOURCE10} \
-  --with-jaf-drop-zip=%{SOURCE11}
-
+%if %{gcjbootstrap}
+  --with-gcj-home=%_jvmdir/java-1.5.0-gcj-1.5.0.0 \
+%endif
+  -with-hotspot-build=hs19 --with-hotspot-src-zip=%{SOURCE7} \
+  --with-jaf-drop-zip=%{SOURCE9} \
+  --with-jaxp-drop-zip=%{SOURCE8} --with-jaxws-drop-zip=%{SOURCE10} \
+  --with-abs-install-dir=%{_jvmdir}/%{sdkdir}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
@@ -614,9 +582,6 @@ pushd %{buildoutputdir}/j2sdk-image
     ln -sf %{sdkdir} %{sdklnk}
   popd
 
-  # Remove javaws man page.
-  rm -f man/man1/javaws.1
-
   # Install man pages.
   install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/man1
   for manpage in man/man1/*
@@ -655,10 +620,6 @@ cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
 sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
 desktop-file-install --vendor ''\
   --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
-%if %with visualvm
-desktop-file-install --vendor ''\
-  --dir $RPM_BUILD_ROOT%{_datadir}/applications visualvm.desktop
-%endif
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
@@ -720,7 +681,6 @@ update-alternatives\
   --slave %{_bindir}/keytool keytool %{jrebindir}/keytool \
   --slave %{_bindir}/orbd orbd %{jrebindir}/orbd \
   --slave %{_bindir}/pack200 pack200 %{jrebindir}/pack200 \
-  --slave %{_bindir}/policytool policytool %{jrebindir}/policytool \
   --slave %{_bindir}/rmid rmid %{jrebindir}/rmid \
   --slave %{_bindir}/rmiregistry rmiregistry %{jrebindir}/rmiregistry \
   --slave %{_bindir}/servertool servertool %{jrebindir}/servertool \
@@ -728,14 +688,14 @@ update-alternatives\
   --slave %{_bindir}/unpack200 unpack200 %{jrebindir}/unpack200 \
   --slave %{_mandir}/man1/java.1$ext java.1$ext \
   %{_mandir}/man1/java-%{name}.1$ext \
+  --slave %{_mandir}/man1/javaws.1$ext javaws.1$ext \
+  %{_mandir}/man1/javaws-%{name}.1$ext \
   --slave %{_mandir}/man1/keytool.1$ext keytool.1$ext \
   %{_mandir}/man1/keytool-%{name}.1$ext \
   --slave %{_mandir}/man1/orbd.1$ext orbd.1$ext \
   %{_mandir}/man1/orbd-%{name}.1$ext \
   --slave %{_mandir}/man1/pack200.1$ext pack200.1$ext \
   %{_mandir}/man1/pack200-%{name}.1$ext \
-  --slave %{_mandir}/man1/policytool.1$ext policytool.1$ext \
-  %{_mandir}/man1/policytool-%{name}.1$ext \
   --slave %{_mandir}/man1/rmid.1$ext rmid.1$ext \
   %{_mandir}/man1/rmid-%{name}.1$ext \
   --slave %{_mandir}/man1/rmiregistry.1$ext rmiregistry.1$ext \
@@ -810,10 +770,8 @@ update-alternatives\
   --slave %{_bindir}/jstack jstack %{sdkbindir}/jstack \
   --slave %{_bindir}/jstat jstat %{sdkbindir}/jstat \
   --slave %{_bindir}/jstatd jstatd %{sdkbindir}/jstatd \
-%if %with visualvm
-  --slave %{_bindir}/jvisualvm jvisualvm %{sdkbindir}/jvisualvm \
-%endif
   --slave %{_bindir}/native2ascii native2ascii %{sdkbindir}/native2ascii \
+  --slave %{_bindir}/policytool policytool %{sdkbindir}/policytool \
   --slave %{_bindir}/rmic rmic %{sdkbindir}/rmic \
   --slave %{_bindir}/schemagen schemagen %{sdkbindir}/schemagen \
   --slave %{_bindir}/serialver serialver %{sdkbindir}/serialver \
@@ -862,6 +820,8 @@ update-alternatives\
   %{_mandir}/man1/jstatd-%{name}.1$ext \
   --slave %{_mandir}/man1/native2ascii.1$ext native2ascii.1$ext \
   %{_mandir}/man1/native2ascii-%{name}.1$ext \
+  --slave %{_mandir}/man1/policytool.1$ext policytool.1$ext \
+  %{_mandir}/man1/policytool-%{name}.1$ext \
   --slave %{_mandir}/man1/rmic.1$ext rmic.1$ext \
   %{_mandir}/man1/rmic-%{name}.1$ext \
   --slave %{_mandir}/man1/schemagen.1$ext schemagen.1$ext \
@@ -956,6 +916,7 @@ exit 0
 %doc openjdk/TRADEMARK
 %doc AUTHORS
 %doc COPYING
+%doc ChangeLog
 %doc NEWS
 %doc README
 %dir %{_jvmdir}/%{sdkdir}
@@ -969,13 +930,12 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
-%{_datadir}/applications/*policytool.desktop
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
+%{_mandir}/man1/javaws-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
 %{_mandir}/man1/orbd-%{name}.1*
 %{_mandir}/man1/pack200-%{name}.1*
-%{_mandir}/man1/policytool-%{name}.1*
 %{_mandir}/man1/rmid-%{name}.1*
 %{_mandir}/man1/rmiregistry-%{name}.1*
 %{_mandir}/man1/servertool-%{name}.1*
@@ -988,7 +948,6 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
-%doc ChangeLog
 %doc %{buildoutputdir}/j2sdk-image/ASSEMBLY_EXCEPTION
 %doc %{buildoutputdir}/j2sdk-image/LICENSE
 %doc %{buildoutputdir}/j2sdk-image/THIRD_PARTY_README
@@ -997,12 +956,23 @@ exit 0
 %dir %{_jvmdir}/%{sdkdir}/bin
 %dir %{_jvmdir}/%{sdkdir}/include
 %dir %{_jvmdir}/%{sdkdir}/lib
+%ifarch %{jit_arches}
+%if %{with_systemtap}
+%dir %{_jvmdir}/%{sdkdir}/tapset
+%endif
+%endif
 %{_jvmdir}/%{sdkdir}/bin/*
 %{_jvmdir}/%{sdkdir}/include/*
 %{_jvmdir}/%{sdkdir}/lib/*
+%ifarch %{jit_arches}
+%if %{with_systemtap}
+%{_jvmdir}/%{sdkdir}/tapset/*.stp
+%endif
+%endif
 %{_jvmdir}/%{sdklnk}
 %{_jvmjardir}/%{sdklnk}
 %{_datadir}/applications/*jconsole.desktop
+%{_datadir}/applications/*policytool.desktop
 %{_mandir}/man1/appletviewer-%{name}.1*
 %{_mandir}/man1/apt-%{name}.1*
 %{_mandir}/man1/extcheck-%{name}.1*
@@ -1025,15 +995,13 @@ exit 0
 %{_mandir}/man1/jstat-%{name}.1*
 %{_mandir}/man1/jstatd-%{name}.1*
 %{_mandir}/man1/native2ascii-%{name}.1*
+%{_mandir}/man1/policytool-%{name}.1*
 %{_mandir}/man1/rmic-%{name}.1*
 %{_mandir}/man1/schemagen-%{name}.1*
 %{_mandir}/man1/serialver-%{name}.1*
 %{_mandir}/man1/wsgen-%{name}.1*
 %{_mandir}/man1/wsimport-%{name}.1*
 %{_mandir}/man1/xjc-%{name}.1*
-%if %with visualvm
-%{_datadir}/applications/visualvm.desktop
-%endif
 %ifarch %{jit_arches}
   %if %{with_systemtap}
     %dir %{_jvmdir}/%{sdkdir}/tapset
