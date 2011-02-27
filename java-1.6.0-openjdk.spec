@@ -150,7 +150,7 @@
 
 %if %mandriva_branch == Cooker
 # Cooker
-%define release %mkrel 14.%{openjdkver}
+%define release %mkrel 15.%{openjdkver}
 %else
 # Old distros
 %define subrel 4
