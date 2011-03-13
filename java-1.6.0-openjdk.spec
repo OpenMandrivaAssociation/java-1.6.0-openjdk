@@ -1,4 +1,11 @@
+%if %mandriva_branch == Cooker
+%define with_systemtap	1
+%define release		%mkrel 16.%{openjdkver}
+%else
 %define with_systemtap	0
+%define subrel		4
+%define release		%mkrel 6.%{openjdkver}
+%endif
 
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
@@ -76,7 +83,7 @@
 %define buildoutputdir openjdk.build
 
 %if %{gcjbootstrap}
-  %define icedteaopt %{nil}
+  %define icedteaopt %{systemtapopt}
 %else
   %ifarch %{jit_arches}
     %define icedteaopt --with-openjdk %{systemtapopt}
@@ -147,15 +154,6 @@
 
 # Prevent brp-java-repack-jars from being run.
 %define __jar_repack	0
-
-%if %mandriva_branch == Cooker
-# Cooker
-%define release %mkrel 15.%{openjdkver}
-%else
-# Old distros
-%define subrel 4
-%define release %mkrel 6.%{openjdkver}
-%endif
 
 Name:    java-%{javaver}-%{origin}
 Version: %{javaver}.%{buildver}
