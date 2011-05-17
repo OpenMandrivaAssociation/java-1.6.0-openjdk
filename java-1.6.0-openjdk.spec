@@ -1,6 +1,6 @@
 %if %mandriva_branch == Cooker
 %define with_systemtap	1
-%define release		%mkrel 16.%{openjdkver}
+%define release		%mkrel 17.%{openjdkver}
 %else
 %define with_systemtap	0
 %define subrel		4
@@ -10,7 +10,7 @@
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 1
+%define gcjbootstrap 0
 
 # If runtests is 0 test suites will not be run.
 %define runtests 0
@@ -452,7 +452,7 @@ export CFLAGS="%{optflags} -fno-tree-vrp"
 %else
   --disable-pulse-java \
 %endif
-  -with-hotspot-build=hs19 --with-hotspot-src-zip=%{SOURCE7} \
+  --with-hotspot-build=hs19 --with-hotspot-src-zip=%{SOURCE7} \
   --with-jaf-drop-zip=%{SOURCE9} \
   --with-jaxp-drop-zip=%{SOURCE8} --with-jaxws-drop-zip=%{SOURCE10} \
   --with-abs-install-dir=%{_jvmdir}/%{sdkdir}
@@ -463,6 +463,14 @@ make patch
 patch -l -p0 < %{PATCH4}
 patch -l -p1 < %{PATCH111}
 patch -l -p1 < %{PATCH112}
+
+# FIXME not really only if !gcjbootrap
+# FIXME until (can?) update to icedtea-1.10* and icedtea-web-1*
+%if !%{gcjbootstrap}
+make stamps/extract-ecj.stamp
+make stamps/patch-ecj.stamp
+rm -f openjdk-ecj/jdk/src/share/classes/javax/swing/TransferHandler.java
+%endif
 
 make STATIC_CXX=false MOZILLA_LIBS=""
 
@@ -997,8 +1005,6 @@ exit 0
 %{_mandir}/man1/xjc-%{name}.1*
 %ifarch %{jit_arches}
   %if %{with_systemtap}
-    %dir %{_jvmdir}/%{sdkdir}/tapset
-    %{_jvmdir}/%{sdkdir}/tapset/*
     %dir %{tapsetdir}
     %{tapsetdir}/*.stp
   %endif
