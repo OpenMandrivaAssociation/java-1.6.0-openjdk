@@ -1,6 +1,6 @@
 %if %mandriva_branch == Cooker
 %define with_systemtap	1
-%define release		%mkrel 17.%{openjdkver}
+%define release		%mkrel 18.%{openjdkver}
 %else
 %define with_systemtap	0
 %define subrel		4
@@ -10,38 +10,26 @@
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap 0
+%define gcjbootstrap	0
 
 # If runtests is 0 test suites will not be run.
-%define runtests 0
+%define runtests	0
 
-%define icedteaver 1.9.7
-%define icedteasnapshot %{nil}
-%define openjdkver b20
-%define openjdkdate 21_jun_2010
-
-%define genurl http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/
+%define icedteaver	1.10.1
+%define icedteasnapshot	%{nil}
+%define openjdkver	b22
+%define openjdkdate	28_feb_2011
+%define mauvedate	2008-10-22
 
 # cabral (fhimpe) we already use java-acess-bridge in Mandriva
-# define accessmajorver 1.23
-# define accessminorver 0
-# define accessver %{accessmajorver}.%{accessminorver}
-# define accessurl http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
+# define accessmajorver	1.23
+# define accessminorver	0
+# define accessver	%{accessmajorver}.%{accessminorver}
+# define accessurl	http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
-%define hotspoturl http://hg.openjdk.java.net/hsx/hsx19/master/archive/
-%define jaxpurl     https://jaxp.dev.java.net/files/documents/913/150648/
-%define jafurl      https://jax-ws.dev.java.net/files/documents/4202/150725/
-%define jaxwsurl    https://jax-ws.dev.java.net/files/documents/4202/150724/
+%define multilib_arches	ppc64 sparc64 x86_64
 
-%define openjdkurlbase http://www.java.net/download/openjdk/jdk6/promoted/
-%define openjdkurl %{openjdkurlbase}%{openjdkver}/
-%define fedorazip  openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
-
-%define mauvedate 2008-10-22
-
-%define multilib_arches ppc64 sparc64 x86_64
-
-%define jit_arches %{ix86} x86_64 sparcv9 sparc64
+%define jit_arches	%{ix86} x86_64 sparcv9 sparc64
 
 %ifarch %{jit_arches}
   %if %{with_systemtap}
@@ -52,32 +40,32 @@
 %endif
 
 %ifarch %{ix86}
-%define archbuild i586
-%define archinstall i386
+  %define archbuild i586
+  %define archinstall i386
 %endif
 %ifarch x86_64
-%define archbuild amd64
-%define archinstall amd64
+  %define archbuild amd64
+  %define archinstall amd64
 %endif
 # 32 bit sparc, optimized for v9
 %ifarch sparcv9
-%define archbuild sparc
-%define archinstall sparc
+  %define archbuild sparc
+  %define archinstall sparc
 %endif
 # 64 bit sparc
 %ifarch sparc64
-%define archbuild sparcv9
-%define archinstall sparcv9
+  %define archbuild sparcv9
+  %define archinstall sparcv9
 %endif
 %ifnarch %{jit_arches}
-%define archbuild %{_arch}
-%define archinstall %{_arch}
+  %define archbuild %{_arch}
+  %define archinstall %{_arch}
 %endif
 
 # Reduce build time from 27 hours to 12 hours by only running test
 # suites on JIT architectures.
 %ifnarch %{jit_arches}
-%define runtests 0
+  %define runtests	0
 %endif
 
 %define buildoutputdir openjdk.build
@@ -86,9 +74,9 @@
   %define icedteaopt %{systemtapopt}
 %else
   %ifarch %{jit_arches}
-    %define icedteaopt --with-openjdk %{systemtapopt}
+    %define icedteaopt --disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk %{systemtapopt}
   %else
-    %define icedteaopt --with-openjdk
+    %define icedteaopt --disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk
   %endif
 %endif
 
@@ -104,11 +92,9 @@
   %define syslibdir	%{_prefix}/lib64
   %define _libdir	%{_prefix}/lib
   %define archname	%{name}.%{_arch}
-  %define javaplugin	libjavaplugin.so.%{_arch}
 %else
   %define syslibdir	%{_libdir}
   %define archname	%{name}
-  %define javaplugin	libjavaplugin.so
 %endif
 
 # Standard JPackage naming and versioning defines.
@@ -155,9 +141,9 @@
 # Prevent brp-java-repack-jars from being run.
 %define __jar_repack	0
 
-Name:    java-%{javaver}-%{origin}
-Version: %{javaver}.%{buildver}
-Release: %{release}
+Name:		java-%{javaver}-%{origin}
+Version:	%{javaver}.%{buildver}
+Release:	%{release}
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -168,72 +154,53 @@ Release: %{release}
 # JDK package >= 1.6.0 to 1, and packages referring to JDK virtual
 # provides >= 1.6.0 must specify the epoch, "java >= 1:1.6.0".
 # ... but that doesn't apply to Mandriva.
-Epoch:   0
-Summary: OpenJDK Runtime Environment
-Group:   Development/Java
+Epoch:		0
+Summary:	OpenJDK Runtime Environment
+Group:		Development/Java
 
-License:  GPLv2 with exceptions
-URL:      http://icedtea.classpath.org/
-Source0:  %{url}download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
+License:	GPLv2 with exceptions
+URL:		http://icedtea.classpath.org/
+Source0:	http://icedtea.classpath.org/download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 # Fedora sources
-Source1: %{fedorazip}
+Source1:	openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
 # (fhimpe) Disabled: we use system java-access-bridge in Mandriva
-#Source2:  %{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
-Source3:  %{genurl}generate-fedora-zip.sh
-Source4:  README.src
-Source5:  mauve-%{mauvedate}.tar.gz
-Source6:  mauve_tests
-Source7:  %{hotspoturl}13edc857b967.tar.gz
-Source8:  %{jaxpurl}jdk6-jaxp-%{openjdkver}.zip
-Source9:  %{jafurl}jdk6-jaf-%{openjdkver}.zip
-Source10: %{jaxwsurl}jdk6-jaxws-%{openjdkver}.zip
-# Fedora patches
-# FIXME: This patch needs to be fixed. optflags argument
-# -mtune=generic is being ignored because it breaks several graphical
-# applications.
-# (wallluck): Fixed to patch configure.ac, not configure
-Patch0:   java-1.6.0-openjdk-optflags.patch
-# (cabral): We already use java-acess-bridge in Mandriva 
-# TODO: make sure these access-bridge patches are present on that package
-# Patch1:   java-1.6.0-openjdk-java-access-bridge-tck.patch
-# Patch2:   java-1.6.0-openjdk-java-access-bridge-idlj.patch
-# Patch3:   java-1.6.0-openjdk-java-access-bridge-security.patch
-Patch4:   java-1.6.0-openjdk-accessible-toolkit.patch
+#Source2:	%{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
+Source3:	http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/generate-fedora-zip.sh
+Source4:	README.src
+Source5:	mauve-%{mauvedate}.tar.gz
+Source6:	mauve_tests
+# hg f0f676c5a2c6
+Source7:	http://hg.openjdk.java.net/hsx/hsx20/master/archive/hotspot.tar.gz
+Source8:	http://icedtea.classpath.org/download/drops/jaxp144_01.zip
+Source9:	http://icedtea.classpath.org/download/drops/jdk6-jaf-b20.zip
+Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws-b20.zip
+Patch0:		makefile-xalan-deps.patch
+Patch1:		java-1.6.0-openjdk-accessible-toolkit.patch
+Patch2:		java-1.6.0-openjdk-fontpath.patch
 
-# Mandriva patches
-# (Anssi 05/2008) Better desktop entry, @JAVAWSBINDIR@ needs replacing
-Patch103:   icedtea6-1.2-javaws-desktop.patch
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
-# corrects #55005 - "unpleasant" bitmap scaled fonts
-Patch111:   java-1.6.0-openjdk-fontpath.patch
-
-# this should be a temporary patch and corrects some clear errors
-Patch112:	icedtea6-1.8.2-mutex_and_leak.patch
-
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-
-BuildRequires: alsa-lib-devel
+BuildRequires:	alsa-lib-devel
 
 BuildRequires:	ant-nodeps
-BuildRequires: cups-devel
-BuildRequires: desktop-file-utils
-BuildRequires: ungif-devel
-BuildRequires: lesstif-devel
+BuildRequires:	cups-devel
+BuildRequires:	desktop-file-utils
+BuildRequires:	ungif-devel
+BuildRequires:	lesstif-devel
 # BuildRequires: %{mklibname xorg-x11-devel}
-BuildRequires: x11-proto-devel
-BuildRequires: libxi-devel
-BuildRequires: libxp-devel
-BuildRequires: libxt-devel
-BuildRequires: libxtst-devel
-BuildRequires: jpeg-devel
-BuildRequires: png-devel
-BuildRequires: wget
-BuildRequires: xalan-j2
-BuildRequires: xerces-j2
-BuildRequires: ant
-BuildRequires: libxinerama-devel
-BuildRequires: rhino
-BuildRequires: zip
+BuildRequires:	x11-proto-devel
+BuildRequires:	libxi-devel
+BuildRequires:	libxp-devel
+BuildRequires:	libxt-devel
+BuildRequires:	libxtst-devel
+BuildRequires:	jpeg-devel
+BuildRequires:	png-devel
+BuildRequires:	xalan-j2
+BuildRequires:	xerces-j2
+BuildRequires:	ant
+BuildRequires:	libxinerama-devel
+BuildRequires:	rhino
+BuildRequires:	zip
 
 %ifarch %{jit_arches}
   %if %{with_systemtap}
@@ -242,122 +209,118 @@ BuildRequires:	systemtap
 %endif
 
 %if %{gcjbootstrap}
-BuildRequires: java-1.5.0-gcj-devel
+BuildRequires:	java-1.5.0-gcj-devel
 %else
-BuildRequires: java-1.6.0-openjdk-devel
+BuildRequires:	java-1.6.0-openjdk-devel
 %endif
 # Mauve build requirements.
-BuildRequires: x11-server-xvfb
-BuildRequires: x11-font-type1
-BuildRequires: x11-font-misc
-BuildRequires: freetype2-devel >= 2.3.0
-BuildRequires: fontconfig
-BuildRequires: eclipse-ecj
+BuildRequires:	x11-server-xvfb
+BuildRequires:	x11-font-type1
+BuildRequires:	x11-font-misc
+BuildRequires:	freetype2-devel >= 2.3.0
+BuildRequires:	fontconfig
+BuildRequires:	eclipse-ecj
 # Java Access Bridge for GNOME build requirements.
-Requires:      java-access-bridge
-BuildRequires: java-access-bridge
-# IcedTeaPlugin build requirements.
-BuildRequires: glib2-devel
-BuildRequires: gtk2-devel
-BuildRequires: xulrunner-devel
+Requires:	java-access-bridge
+BuildRequires:	java-access-bridge
 %if %mdkversion >= 200910
 # PulseAudio build requirements.
-BuildRequires: pulseaudio-devel >= 0.9.11
-BuildRequires: pulseaudio >= 0.9.11
+BuildRequires:	pulseaudio-devel >= 0.9.11
+BuildRequires:	pulseaudio >= 0.9.11
 %endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
-BuildRequires: libffi-devel
+BuildRequires:	libffi-devel
 %endif
 # Require /etc/pki/java/cacerts.
-Requires: rootcerts-java
-Requires: rhino
+Requires:	rootcerts-java
+Requires:	rhino
 # Require jpackage-utils for ant.
-Requires: jpackage-utils >= 1.7.3-1jpp.2
+Requires:	jpackage-utils >= 1.7.3-1jpp.2
 # Require zoneinfo data provided by tzdata-java subpackage.
-Requires: tzdata-java
+Requires:	tzdata-java
 # Post requires alternatives to install tool alternatives.
-Requires(post):   update-alternatives
+Requires(post):	update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
 %if %mdkversion < 200900
 # Post requires update-desktop-database to update desktop database
 # for jnlp files.
-Requires(post):   desktop-file-utils
+Requires(post):	desktop-file-utils
 # Postun requires update-desktop-database to update desktop database
 # for jnlp files.
 Requires(postun): desktop-file-utils
 %endif
 # java-1.6.0-openjdk replaces java-1.7.0-icedtea.
-Provides: java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
-Obsoletes: java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
+Provides:	java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
+Obsoletes:	java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
 
 # FIXME fonts-ttf-dejavu-lgc is the default, but currently is not directly
 # available in Mandriva
-Requires: fonts-ttf-dejavu
+Requires:	fonts-ttf-dejavu
 
 # Standard JPackage base provides.
-Provides: jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{origin} = %{epoch}:%{version}-%{release}
-Provides: jre-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver} = %{epoch}:%{version}-%{release}
-Provides: jre = %{javaver}
-Provides: java-%{origin} = %{epoch}:%{version}-%{release}
-Provides: java = %{epoch}:%{javaver}
+Provides:	jre-%{javaver}-%{origin} = %{epoch}:%{version}-%{release}
+Provides:	jre-%{origin} = %{epoch}:%{version}-%{release}
+Provides:	jre-%{javaver} = %{epoch}:%{version}-%{release}
+Provides:	java-%{javaver} = %{epoch}:%{version}-%{release}
+Provides:	jre = %{javaver}
+Provides:	java-%{origin} = %{epoch}:%{version}-%{release}
+Provides:	java = %{epoch}:%{javaver}
 # Standard JPackage extensions provides.
-Provides: jndi = %{epoch}:%{version}
-Provides: jndi-ldap = %{epoch}:%{version}
-Provides: jndi-cos = %{epoch}:%{version}
-Provides: jndi-rmi = %{epoch}:%{version}
-Provides: jndi-dns = %{epoch}:%{version}
-Provides: jaas = %{epoch}:%{version}
-Provides: jsse = %{epoch}:%{version}
-Provides: jce = %{epoch}:%{version}
-Provides: jdbc-stdext = 3.0
-Provides: java-sasl = %{epoch}:%{version}
-Provides: java-fonts = %{epoch}:%{version}
+Provides:	jndi = %{epoch}:%{version}
+Provides:	jndi-ldap = %{epoch}:%{version}
+Provides:	jndi-cos = %{epoch}:%{version}
+Provides:	jndi-rmi = %{epoch}:%{version}
+Provides:	jndi-dns = %{epoch}:%{version}
+Provides:	jaas = %{epoch}:%{version}
+Provides:	jsse = %{epoch}:%{version}
+Provides:	jce = %{epoch}:%{version}
+Provides:	jdbc-stdext = 3.0
+Provides:	java-sasl = %{epoch}:%{version}
+Provides:	java-fonts = %{epoch}:%{version}
 
 %description
 The OpenJDK runtime environment.
 
-%package devel
-Summary: OpenJDK Development Environment
-Group:   Development/Java
+%package	devel
+Summary:	OpenJDK Development Environment
+Group:		Development/Java
 
 # Require base package.
 Requires:         %{name} = %{epoch}:%{version}-%{release}
 # Post requires alternatives to install tool alternatives.
-Requires(post):   update-alternatives
+Requires(post):	update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
 
 # java-1.6.0-openjdk-devel replaces java-1.7.0-icedtea-devel.
-Provides: java-1.7.0-icedtea-devel = 0:1.7.0.0-24.726.2
-Obsoletes: java-1.7.0-icedtea-devel < 0:1.7.0.0-24.726.2
+Provides:	java-1.7.0-icedtea-devel = 0:1.7.0.0-24.726.2
+Obsoletes:	java-1.7.0-icedtea-devel < 0:1.7.0.0-24.726.2
 
 # Standard JPackage devel provides.
-Provides: java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
-Provides: java-sdk-%{javaver} = %{epoch}:%{version}
-Provides: java-sdk-%{origin} = %{epoch}:%{version}
-Provides: java-sdk = %{epoch}:%{javaver}
-Provides: java-%{javaver}-devel = %{epoch}:%{version}
-Provides: java-devel-%{origin} = %{epoch}:%{version}
-Provides: java-devel = %{epoch}:%{javaver}
+Provides:	java-sdk-%{javaver}-%{origin} = %{epoch}:%{version}
+Provides:	java-sdk-%{javaver} = %{epoch}:%{version}
+Provides:	java-sdk-%{origin} = %{epoch}:%{version}
+Provides:	java-sdk = %{epoch}:%{javaver}
+Provides:	java-%{javaver}-devel = %{epoch}:%{version}
+Provides:	java-devel-%{origin} = %{epoch}:%{version}
+Provides:	java-devel = %{epoch}:%{javaver}
 
-%description devel
+%description	devel
 The OpenJDK development tools.
 
-%package demo
-Summary: OpenJDK Demos
-Group:   Development/Java
+%package	demo
+Summary:	OpenJDK Demos
+Group:		Development/Java
 
-Requires: %{name} = %{epoch}:%{version}-%{release}
+Requires:	%{name} = %{epoch}:%{version}-%{release}
 
 # java-1.6.0-openjdk-demo replaces java-1.7.0-icedtea-demo.
 Provides: java-1.7.0-icedtea-demo = 0:1.7.0.0-24.726.2
 Obsoletes: java-1.7.0-icedtea-demo < 0:1.7.0.0-24.726.2
 
-%description demo
+%description	demo
 The OpenJDK demos.
 
 %package src
@@ -386,45 +349,21 @@ Requires(post):   update-alternatives
 Requires(postun): update-alternatives
 
 # java-1.6.0-openjdk-javadoc replaces java-1.7.0-icedtea-javadoc.
-Provides: java-1.7.0-icedtea-javadoc = 0:1.7.0.0-24.726.2
-Obsoletes: java-1.7.0-icedtea-javadoc < 0:1.7.0.0-24.726.2
+Provides:	java-1.7.0-icedtea-javadoc = 0:1.7.0.0-24.726.2
+Obsoletes:	java-1.7.0-icedtea-javadoc < 0:1.7.0.0-24.726.2
 
 # Standard JPackage javadoc provides.
-Provides: java-javadoc = %{epoch}:%{version}-%{release}
-Provides: java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
+Provides:	java-javadoc = %{epoch}:%{version}-%{release}
+Provides:	java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 
-%description javadoc
+%description	javadoc
 The OpenJDK API documentation.
-
-%package plugin
-Summary: OpenJDK Web Browser Plugin
-Group:   Development/Java
-
-Requires: %{name} = %{epoch}:%{version}-%{release}
-Requires: %{syslibdir}/mozilla/plugins
-# Post requires alternatives to install plugin alternative.
-Requires(post):   update-alternatives
-# Postun requires alternatives to uninstall plugin alternative.
-Requires(postun): update-alternatives
-
-# java-1.6.0-openjdk-plugin replaces java-1.7.0-icedtea-plugin.
-Provides: java-1.7.0-icedtea-plugin = 0:1.7.0.0-24.726.2
-Obsoletes: java-1.7.0-icedtea-plugin < 0:1.7.0.0-24.726.2
-
-# Standard JPackage plugin provides.
-Provides: java-plugin = %{javaver}
-Provides: java-%{javaver}-plugin = %{epoch}:%{version}
-
-%description plugin
-The OpenJDK web browser plugin.
 
 %prep
 %setup -q -n icedtea6-%{icedteaver}
 %setup -q -n icedtea6-%{icedteaver} -T -D -a 5
 cp %{SOURCE4} .
 cp %{SOURCE6} .
-%patch0
-%patch103
 
 # (oe) instead of a patch
 perl -pi -e "s|libxul-unstable|libxul|g" configure*
@@ -443,36 +382,34 @@ perl -pi -e "s|libxul-unstable|libxul|g" configure*
 # Build IcedTea and OpenJDK.
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
-export CFLAGS="%{optflags} -fno-tree-vrp"
-# FIXME should not need to pass --with-gcj-home
-%{configure2_5x} %{icedteaopt} --with-openjdk-src-zip=%{SOURCE1} \
-  --with-pkgversion=mandriva-%{release}-%{_arch} \
+
+patch -l -p0 < %{PATCH0}
+
+%{configure2_5x}					\
+	%{icedteaopt}					\
+	--with-openjdk-src-zip=%{SOURCE1}		\
+	--with-pkgversion=mandriva-%{release}-%{_arch}	\
 %if %mdkversion >= 200910
-  --enable-pulse-java \
+	--enable-pulse-java				\
 %else
-  --disable-pulse-java \
+	--disable-pulse-java				\
 %endif
-  --with-hotspot-build=hs19 --with-hotspot-src-zip=%{SOURCE7} \
-  --with-jaf-drop-zip=%{SOURCE9} \
-  --with-jaxp-drop-zip=%{SOURCE8} --with-jaxws-drop-zip=%{SOURCE10} \
-  --with-abs-install-dir=%{_jvmdir}/%{sdkdir}
+	--with-hotspot-build=hs20			\
+	--with-hotspot-src-zip=%{SOURCE7}		\
+	--with-jaf-drop-zip=%{SOURCE9}			\
+	--with-jaxp-drop-zip=%{SOURCE8}			\
+	--with-jaxws-drop-zip=%{SOURCE10}		\
+	--with-javah=%{_bindir}/javah			\
+	--with-abs-install-dir=%{_jvmdir}/%{sdkdir}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
+
 make patch
-patch -l -p0 < %{PATCH4}
-patch -l -p1 < %{PATCH111}
-patch -l -p1 < %{PATCH112}
+patch -l -p0 < %{PATCH1}
+patch -l -p1 < %{PATCH2}
 
-# FIXME not really only if !gcjbootrap
-# FIXME until (can?) update to icedtea-1.10* and icedtea-web-1*
-%if !%{gcjbootstrap}
-make stamps/extract-ecj.stamp
-make stamps/patch-ecj.stamp
-rm -f openjdk-ecj/jdk/src/share/classes/javax/swing/TransferHandler.java
-%endif
-
-make STATIC_CXX=false MOZILLA_LIBS=""
+make STATIC_CXX=false
 
 touch mauve-%{mauvedate}/mauve_output
 
@@ -615,12 +552,7 @@ for s in 16 24 32 48 ; do
 done
 
 # Install desktop files.
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/{applications,pixmaps}
-cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
-# (Anssi 07/2008) Mandriva patch:
-sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
-desktop-file-install --vendor ''\
-  --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
 perl -pi -e 's|(Categories=Development;)(Monitor;Java;)|$1System;$2|'	\
     jconsole.desktop
 for e in jconsole policytool ; do
@@ -664,9 +596,6 @@ find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
   | sed 's|^|%doc |' \
   >> %{name}-demo.files
 
-# (Anssi 05/2008) for update-alternatives:
-install -d -m755 %{buildroot}%{syslibdir}/mozilla/plugins
-
 cp -fa %{buildroot}%{_jvmdir}/%{jredir}/lib/fontconfig.properties{.src,}
 
 %clean
@@ -680,7 +609,6 @@ update-alternatives\
   --install %{_bindir}/java java %{jrebindir}/java %{priority} \
   --slave %{_jvmdir}/jre jre %{_jvmdir}/%{jrelnk} \
   --slave %{_jvmjardir}/jre jre_exports %{_jvmjardir}/%{jrelnk} \
-  --slave %{_bindir}/javaws javaws %{jrebindir}/javaws \
   --slave %{_bindir}/keytool keytool %{jrebindir}/keytool \
   --slave %{_bindir}/orbd orbd %{jrebindir}/orbd \
   --slave %{_bindir}/pack200 pack200 %{jrebindir}/pack200 \
@@ -691,8 +619,6 @@ update-alternatives\
   --slave %{_bindir}/unpack200 unpack200 %{jrebindir}/unpack200 \
   --slave %{_mandir}/man1/java.1$ext java.1$ext \
   %{_mandir}/man1/java-%{name}.1$ext \
-  --slave %{_mandir}/man1/javaws.1$ext javaws.1$ext \
-  %{_mandir}/man1/javaws-%{name}.1$ext \
   --slave %{_mandir}/man1/keytool.1$ext keytool.1$ext \
   %{_mandir}/man1/keytool-%{name}.1$ext \
   --slave %{_mandir}/man1/orbd.1$ext orbd.1$ext \
@@ -883,33 +809,6 @@ fi
 
 exit 0
 
-%post plugin
-if [ $1 -gt 1 ]
-then
-  update-alternatives --remove %{javaplugin} \
-    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/gcjwebplugin.so
-fi
-
-if [ -f %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so ]; then
-    update-alternatives --remove %{javaplugin} \
-	%{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaNPPlugin.so
-fi
-
-update-alternatives\
-  --install %{syslibdir}/mozilla/plugins/libjavaplugin.so %{javaplugin} \
-  %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so %{priority}
-
-exit 0
-
-%postun plugin
-if [ $1 -eq 0 ]
-then
-  update-alternatives --remove %{javaplugin} \
-    %{_jvmdir}/%{jrelnk}/lib/%{archinstall}/IcedTeaPlugin.so
-fi
-
-exit 0
-
 %files -f %{name}.files
 %defattr(-,root,root,-)
 %doc %{buildoutputdir}/j2sdk-image/jre/ASSEMBLY_EXCEPTION
@@ -935,7 +834,6 @@ exit 0
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*
-%{_mandir}/man1/javaws-%{name}.1*
 %{_mandir}/man1/keytool-%{name}.1*
 %{_mandir}/man1/orbd-%{name}.1*
 %{_mandir}/man1/pack200-%{name}.1*
@@ -944,8 +842,6 @@ exit 0
 %{_mandir}/man1/servertool-%{name}.1*
 %{_mandir}/man1/tnameserv-%{name}.1*
 %{_mandir}/man1/unpack200-%{name}.1*
-%{_datadir}/pixmaps/javaws.png
-%{_datadir}/applications/javaws.desktop
 # FIXME: This should be %config
 %{_jvmdir}/%{jredir}/lib/fontconfig.properties
 
@@ -1007,6 +903,8 @@ exit 0
 %{_mandir}/man1/xjc-%{name}.1*
 %ifarch %{jit_arches}
   %if %{with_systemtap}
+    %dir %{_jvmdir}/%{sdkdir}/tapset
+    %{_jvmdir}/%{sdkdir}/tapset/*
     %dir %{tapsetdir}
     %{tapsetdir}/*.stp
   %endif
@@ -1029,10 +927,3 @@ exit 0
 %files javadoc
 %defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}
-
-%files plugin
-%defattr(-,root,root,-)
-%dir %{syslibdir}/mozilla
-%dir %{syslibdir}/mozilla/plugins
-%{_jvmdir}/%{jredir}/lib/%{archinstall}/IcedTeaPlugin.so
-
