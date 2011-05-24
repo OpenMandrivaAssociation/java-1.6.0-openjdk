@@ -621,6 +621,8 @@ cp javaws.png $RPM_BUILD_ROOT%{_datadir}/pixmaps
 sed -i 's,@JAVAWSBINDIR@,%{jrebindir},' javaws.desktop
 desktop-file-install --vendor ''\
   --dir $RPM_BUILD_ROOT%{_datadir}/applications javaws.desktop
+perl -pi -e 's|(Categories=Development;)(Monitor;Java;)|$1System;$2|'	\
+    jconsole.desktop
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
         --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
