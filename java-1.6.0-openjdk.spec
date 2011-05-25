@@ -200,6 +200,7 @@ BuildRequires:	xerces-j2
 BuildRequires:	ant
 BuildRequires:	libxinerama-devel
 BuildRequires:	rhino
+BuildRequires:	wget
 BuildRequires:	zip
 
 %ifarch %{jit_arches}
