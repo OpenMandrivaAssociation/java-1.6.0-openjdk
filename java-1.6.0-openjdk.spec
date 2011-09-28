@@ -1,126 +1,99 @@
 %if %mandriva_branch == Cooker
-%define with_systemtap	1
-%define release		%mkrel 22.%{openjdkver}
+%define with_systemtap		1
+%define release			%mkrel 22.%{openjdkver}
 %else
-%define with_systemtap	0
-%define subrel		1
-%define release		%mkrel 22.%{openjdkver}
+%define with_systemtap		0
+%define subrel			1
+%define release			%mkrel 22.%{openjdkver}
 %endif
 
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap	0
+%define gcjbootstrap		0
 
-# If runtests is 0 test suites will not be run.
-%define runtests	0
-
-%define icedteaver	1.10.3
-%define icedteasnapshot	%{nil}
-%define openjdkver	b22
-%define openjdkdate	28_feb_2011
-%define mauvedate	2008-10-22
+%define icedteaver		1.10.3
+%define icedteasnapshot		%{nil}
+%define openjdkver		b22
+%define openjdkdate		28_feb_2011
+%define mauvedate		2008-10-22
 
 # cabral (fhimpe) we already use java-acess-bridge in Mandriva
-# define accessmajorver	1.23
-# define accessminorver	0
-# define accessver	%{accessmajorver}.%{accessminorver}
-# define accessurl	http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
+# define accessmajorver		1.23
+# define accessminorver		0
+# define accessver		%{accessmajorver}.%{accessminorver}
+# define accessurl		http://ftp.gnome.org/pub/GNOME/sources/java-access-bridge/
 
-%define multilib_arches	ppc64 sparc64 x86_64
+%define multilib_arches		ppc64 sparc64 x86_64
+%define jit_arches		%{ix86} x86_64 sparcv9 sparc64
 
-%define jit_arches	%{ix86} x86_64 sparcv9 sparc64
-
+%define systemtapopt		--disable-systemtap
 %ifarch %{jit_arches}
+  %define runtests		0
+  %define build_docs		1
+  %define with_fastjar		0
   %if %{with_systemtap}
     %define systemtapopt	--enable-systemtap
-  %else
-    %define systemtapopt	--disable-systemtap
   %endif
+%else
+  %define runtests		0
+  %define build_docs		0
+  %define with_fastjar		1
 %endif
 
-%ifarch %{ix86}
-  %define archbuild i586
-  %define archinstall i386
-%endif
-%ifarch x86_64
-  %define archbuild amd64
-  %define archinstall amd64
-%endif
-# 32 bit sparc, optimized for v9
-%ifarch sparcv9
-  %define archbuild sparc
-  %define archinstall sparc
-%endif
-# 64 bit sparc
-%ifarch sparc64
-  %define archbuild sparcv9
-  %define archinstall sparcv9
-%endif
-%ifnarch %{jit_arches}
-  %define archbuild %{_arch}
-  %define archinstall %{_arch}
-%endif
-
-# Reduce build time from 27 hours to 12 hours by only running test
-# suites on JIT architectures.
-%ifnarch %{jit_arches}
-  %define runtests	0
-%endif
-
-%define buildoutputdir openjdk.build
+%define buildoutputdir		openjdk.build
 
 %if %{gcjbootstrap}
-  %define icedteaopt %{systemtapopt}
+  %define icedteaopt		%{systemtapopt}
 %else
   %ifarch %{jit_arches}
-    %define icedteaopt --disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk %{systemtapopt}
+    %define icedteaopt		--disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk %{systemtapopt}
   %else
-    %define icedteaopt --disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk
+    %define icedteaopt		--disable-bootstrap --with-jdk-home=/usr/lib/jvm/java-openjdk
   %endif
 %endif
 
 # Convert an absolute path to a relative path.  Each symbolic link is
 # specified relative to the directory in which it is installed so that
 # it will resolve properly within chrooted installations.
-%define script 'use File::Spec; print File::Spec->abs2rel($ARGV[0], $ARGV[1])'
-%define abs2rel %{__perl} -e %{script}
+%define script			'use File::Spec; print File::Spec->abs2rel($ARGV[0], $ARGV[1])'
+%define abs2rel			%{__perl} -e %{script}
 
 # Hard-code libdir on 64-bit architectures to make the 64-bit JDK
 # simply be another alternative.
 %ifarch %{multilib_arches}
-  %define syslibdir	%{_prefix}/lib64
-  %define _libdir	%{_prefix}/lib
-  %define archname	%{name}.%{_arch}
+  %define syslibdir		%{_prefix}/lib64
+  %define _libdir		%{_prefix}/lib
+  %define archname		%{name}.%{_arch}
 %else
-  %define syslibdir	%{_libdir}
-  %define archname	%{name}
+  %define syslibdir		%{_libdir}
+  %define archname		%{name}
 %endif
 
 # Standard JPackage naming and versioning defines.
-%define origin          openjdk
-%define priority        16000
-%define javaver         1.6.0
-%define buildver        0
+%define origin			openjdk
+%define priority		16000
+%define javaver			1.6.0
+%define buildver		0
 
 # Standard JPackage directories and symbolic links.
 # Make 64-bit JDKs just another alternative on 64-bit architectures.
 %ifarch %{multilib_arches}
-  %define sdklnk	java-%{javaver}-%{origin}.%{_arch}
-  %define jrelnk	jre-%{javaver}-%{origin}.%{_arch}
-  %define sdkdir	%{name}-%{version}.%{_arch}
+  %define sdklnk		java-%{javaver}-%{origin}.%{_arch}
+  %define jrelnk		jre-%{javaver}-%{origin}.%{_arch}
+  %define sdkdir		%{name}-%{version}.%{_arch}
 %else
-  %define sdklnk	java-%{javaver}-%{origin}
-  %define jrelnk	jre-%{javaver}-%{origin}
-  %define sdkdir	%{name}-%{version}
+  %define sdklnk		java-%{javaver}-%{origin}
+  %define jrelnk		jre-%{javaver}-%{origin}
+  %define sdkdir		%{name}-%{version}
 %endif
-%define jredir          %{sdkdir}/jre
-%define sdkbindir       %{_jvmdir}/%{sdklnk}/bin
-%define jrebindir       %{_jvmdir}/%{jrelnk}/bin
+%define jredir			%{sdkdir}/jre
+%define sdkbindir		%{_jvmdir}/%{sdklnk}/bin
+%define jrebindir		%{_jvmdir}/%{jrelnk}/bin
 %ifarch %{multilib_arches}
-  %define jvmjardir	%{_jvmjardir}/%{name}-%{version}.%{_arch}
+  %define jvmjardir		%{_jvmjardir}/%{name}-%{version}.%{_arch}
 %else
-  %define jvmjardir	%{_jvmjardir}/%{name}-%{version}
+  %define jvmjardir		%{_jvmjardir}/%{name}-%{version}
 %endif
 
 %ifarch %{jit_arches}
@@ -134,12 +107,12 @@
 # for the primary arch for now). Systemtap uses the machine name
 # aka build_cpu as architecture specific directory name.
 #%#define tapsetdir /usr/share/systemtap/tapset/%{sdkdir}
-    %define tapsetdir %{_datadir}/systemtap/tapset/%{_build_cpu}
+    %define tapsetdir		%{_datadir}/systemtap/tapset/%{_build_cpu}
   %endif
 %endif 
 
 # Prevent brp-java-repack-jars from being run.
-%define __jar_repack	0
+%define __jar_repack		0
 
 Name:		java-%{javaver}-%{origin}
 Version:	%{javaver}.%{buildver}
@@ -185,6 +158,9 @@ BuildRequires:	alsa-lib-devel
 BuildRequires:	ant-nodeps
 BuildRequires:	cups-devel
 BuildRequires:	desktop-file-utils
+%if %{with_fastjar}
+BuildRequires:	fastjar
+%endif
 BuildRequires:	ungif-devel
 BuildRequires:	lesstif-devel
 # BuildRequires: %{mklibname xorg-x11-devel}
@@ -338,6 +314,7 @@ Obsoletes: java-1.7.0-icedtea-src < 0:1.7.0.0-24.726.2
 %description src
 The OpenJDK source bundle.
 
+%if %{build_docs}
 %package javadoc
 Summary: OpenJDK API Documentation
 Group:   Development/Java
@@ -360,6 +337,7 @@ Provides:	java-%{javaver}-javadoc = %{epoch}:%{version}-%{release}
 
 %description	javadoc
 The OpenJDK API documentation.
+%endif
 
 %prep
 %setup -q -n icedtea6-%{icedteaver}
@@ -402,6 +380,13 @@ patch -l -p0 < %{PATCH0}
 	--with-jaxp-drop-zip=%{SOURCE8}			\
 	--with-jaxws-drop-zip=%{SOURCE10}		\
 	--with-javah=%{_bindir}/javah			\
+%if %{with_fastjar}
+	--with-jar=%{_bindir}/fastjar			\
+	--with-alt-jar=%{_bindir}/fastjar		\
+%endif
+%if !%{build_docs}
+        --disable-docs                                  \
+%endif
 	--with-abs-install-dir=%{_jvmdir}/%{sdkdir}
 %if %{gcjbootstrap}
 make stamps/patch-ecj.stamp
@@ -543,8 +528,10 @@ pushd %{buildoutputdir}/j2sdk-image
 popd
 
 # Install Javadoc documentation.
+%if %{build_docs}
 install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}
 cp -a %{buildoutputdir}/docs $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+%endif
 
 # Install icons and menu entries.
 for s in 16 24 32 48 ; do
@@ -783,6 +770,7 @@ update-alternatives\
 %endif
 exit 0
 
+%if %{build_docs}
 %postun devel
 if [ $1 -eq 0 ]
 then
@@ -810,6 +798,7 @@ then
 fi
 
 exit 0
+%endif
 
 %files -f %{name}.files
 %defattr(-,root,root,-)
@@ -926,6 +915,8 @@ exit 0
 %doc test/jtreg-summary.log
 %endif
 
+%if %{build_docs}
 %files javadoc
 %defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}
+%endif
