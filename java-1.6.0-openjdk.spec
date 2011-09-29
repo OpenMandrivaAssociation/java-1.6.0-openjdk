@@ -284,6 +284,9 @@ Provides:	java-sdk = %{epoch}:%{javaver}
 Provides:	java-%{javaver}-devel = %{epoch}:%{version}
 Provides:	java-devel-%{origin} = %{epoch}:%{version}
 Provides:	java-devel = %{epoch}:%{javaver}
+%if !%{build_docs}
+Provides:	java-javadoc = %{epoch}:%{javaver}
+%endif
 
 %description	devel
 The OpenJDK development tools.
@@ -770,7 +773,6 @@ update-alternatives\
 %endif
 exit 0
 
-%if %{build_docs}
 %postun devel
 if [ $1 -eq 0 ]
 then
@@ -784,6 +786,7 @@ fi
 %endif
 exit 0
 
+%if %{build_docs}
 %post javadoc
 update-alternatives\
   --install %{_javadocdir}/java javadocdir %{_javadocdir}/%{name}/api \
