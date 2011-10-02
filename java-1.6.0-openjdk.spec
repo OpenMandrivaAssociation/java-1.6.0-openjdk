@@ -179,6 +179,7 @@ BuildRequires:	libxrender-devel
 BuildRequires:	rhino
 BuildRequires:	wget
 BuildRequires:	zip
+BuildRequires:	aclocal
 
 %ifarch %{jit_arches}
   %if %{with_systemtap}
