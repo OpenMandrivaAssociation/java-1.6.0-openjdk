@@ -1,10 +1,10 @@
 %if %mandriva_branch == Cooker
 %define with_systemtap		1
-%define release			%mkrel 22.%{openjdkver}
+%define release			%mkrel 23.%{openjdkver}
 %else
 %define with_systemtap		0
 %define subrel			1
-%define release			%mkrel 22.%{openjdkver}
+%define release			%mkrel 23.%{openjdkver}
 %endif
 
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
