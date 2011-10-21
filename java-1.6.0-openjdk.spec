@@ -10,7 +10,7 @@
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
 # java-1.5.0-gcj-devel.  If gcjbootstrap is 0 IcedTea is built against
 # java-1.6.0-openjdk-devel.
-%define gcjbootstrap		0
+%bcond_with			gcjbootstrap
 
 %define icedteaver		1.10.3
 %define icedteasnapshot		%{nil}
@@ -43,7 +43,7 @@
 
 %define buildoutputdir		openjdk.build
 
-%if %{gcjbootstrap}
+%if %{with gcjbootstrap}
   %define icedteaopt		%{systemtapopt}
 %else
   %ifarch %{jit_arches}
@@ -187,7 +187,7 @@ BuildRequires:	systemtap
   %endif
 %endif
 
-%if %{gcjbootstrap}
+%if %{with gcjbootstrap}
 BuildRequires:	java-1.5.0-gcj-devel
 %else
 BuildRequires:	java-1.6.0-openjdk-devel
@@ -201,7 +201,9 @@ BuildRequires:	fontconfig
 BuildRequires:	eclipse-ecj
 # Java Access Bridge for GNOME build requirements.
 Requires:	java-access-bridge
+%if %{without gcjbootstrap}
 BuildRequires:	java-access-bridge
+%endif
 %if %mdkversion >= 200910
 # PulseAudio build requirements.
 BuildRequires:	pulseaudio-devel >= 0.9.11
@@ -392,7 +394,7 @@ patch -l -p0 < %{PATCH0}
         --disable-docs                                  \
 %endif
 	--with-abs-install-dir=%{_jvmdir}/%{sdkdir}
-%if %{gcjbootstrap}
+%if %{with gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
 
