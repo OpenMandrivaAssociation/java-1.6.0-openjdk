@@ -445,22 +445,22 @@ popd
 %endif
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 pushd %{buildoutputdir}/j2sdk-image
 
   # Install main files.
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  cp -a bin include lib src.zip $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
-  cp -a jre/bin jre/lib $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}
+  install -d -m 755 %{buildroot}%{_jvmdir}/%{sdkdir}
+  cp -a bin include lib src.zip %{buildroot}%{_jvmdir}/%{sdkdir}
+  install -d -m 755 %{buildroot}%{_jvmdir}/%{jredir}
+  cp -a jre/bin jre/lib %{buildroot}%{_jvmdir}/%{jredir}
 
 %ifarch %{jit_arches}
   %if %{with_systemtap}
     # Install systemtap support files.
-    cp -a tapset $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
-    install -d -m 755 $RPM_BUILD_ROOT%{tapsetdir}
-    pushd $RPM_BUILD_ROOT%{tapsetdir}
+    cp -a tapset %{buildroot}%{_jvmdir}/%{sdkdir}
+    install -d -m 755 %{buildroot}%{tapsetdir}
+    pushd %{buildroot}%{tapsetdir}
       RELATIVE=$(%{abs2rel} %{_jvmdir}/%{sdkdir}/tapset %{tapsetdir})
       ln -sf $RELATIVE/*.stp .
     popd
@@ -468,16 +468,16 @@ pushd %{buildoutputdir}/j2sdk-image
 %endif
 
   # Install cacerts symlink.
-  rm -f $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security/cacerts
-  pushd $RPM_BUILD_ROOT%{_jvmdir}/%{jredir}/lib/security
+  rm -f %{buildroot}%{_jvmdir}/%{jredir}/lib/security/cacerts
+  pushd %{buildroot}%{_jvmdir}/%{jredir}/lib/security
     RELATIVE=$(%{abs2rel} %{_sysconfdir}/pki/java \
       %{_jvmdir}/%{jredir}/lib/security)
     ln -sf $RELATIVE/cacerts .
   popd
 
   # Install extension symlinks.
-  install -d -m 755 $RPM_BUILD_ROOT%{jvmjardir}
-  pushd $RPM_BUILD_ROOT%{jvmjardir}
+  install -d -m 755 %{buildroot}%{jvmjardir}
+  pushd %{buildroot}%{jvmjardir}
     RELATIVE=$(%{abs2rel} %{_jvmdir}/%{jredir}/lib %{jvmjardir})
     ln -sf $RELATIVE/jsse.jar jsse-%{version}.jar
     ln -sf $RELATIVE/jce.jar jce-%{version}.jar
@@ -500,101 +500,101 @@ pushd %{buildoutputdir}/j2sdk-image
   popd
 
   # Install JCE policy symlinks.
-  install -d -m 755 $RPM_BUILD_ROOT%{_jvmprivdir}/%{archname}/jce/vanilla
+  install -d -m 755 %{buildroot}%{_jvmprivdir}/%{archname}/jce/vanilla
 
   # Install versionless symlinks.
-  pushd $RPM_BUILD_ROOT%{_jvmdir}
+  pushd %{buildroot}%{_jvmdir}
     ln -sf %{jredir} %{jrelnk}
     ln -sf %{sdkdir} %{sdklnk}
   popd
 
-  pushd $RPM_BUILD_ROOT%{_jvmjardir}
+  pushd %{buildroot}%{_jvmjardir}
     ln -sf %{sdkdir} %{jrelnk}
     ln -sf %{sdkdir} %{sdklnk}
   popd
 
   # Install man pages.
-  install -d -m 755 $RPM_BUILD_ROOT%{_mandir}/man1
+  install -d -m 755 %{buildroot}%{_mandir}/man1
   for manpage in man/man1/*
   do
     # Convert man pages to UTF8 encoding.
     iconv -f ISO_8859-1 -t UTF8 $manpage -o $manpage.tmp
     mv -f $manpage.tmp $manpage
-    install -m 644 -p $manpage $RPM_BUILD_ROOT%{_mandir}/man1/$(basename \
+    install -m 644 -p $manpage %{buildroot}%{_mandir}/man1/$(basename \
       $manpage .1)-%{name}.1
   done
 
   # Install demos and samples.
-  cp -a demo $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
+  cp -a demo %{buildroot}%{_jvmdir}/%{sdkdir}
   mkdir -p sample/rmi
   # XXX: (walluck): fix -ba --short-circuit
   test -f bin/sample.cgi && mv bin/java-rmi.cgi sample/rmi
-  cp -a sample $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}
+  cp -a sample %{buildroot}%{_jvmdir}/%{sdkdir}
 
 popd
 
 # Install Javadoc documentation.
 %if %{build_docs}
-install -d -m 755 $RPM_BUILD_ROOT%{_javadocdir}
-cp -a %{buildoutputdir}/docs $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+install -d -m 755 %{buildroot}%{_javadocdir}
+cp -a %{buildoutputdir}/docs %{buildroot}%{_javadocdir}/%{name}
 %endif
 
 # Install icons and menu entries.
 for s in 16 24 32 48 ; do
   install -D -p -m 644 \
     openjdk/jdk/src/solaris/classes/sun/awt/X11/java-icon${s}.png \
-    $RPM_BUILD_ROOT%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
+    %{buildroot}%{_datadir}/icons/hicolor/${s}x${s}/apps/java.png
 done
 
 # Install desktop files.
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/applications
+install -d -m 755 %{buildroot}%{_datadir}/applications
 perl -pi -e 's|(Categories=Development;)(Monitor;Java;)|$1System;$2|'	\
     jconsole.desktop
 for e in jconsole policytool ; do
     desktop-file-install --vendor="" --mode=644 \
-        --dir=$RPM_BUILD_ROOT%{_datadir}/applications $e.desktop
+        --dir=%{buildroot}%{_datadir}/applications $e.desktop
 done
 
 # Find JRE directories.
-find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type d \
+find %{buildroot}%{_jvmdir}/%{jredir} -type d \
   | grep -v jre/lib/security \
-  | sed 's|'$RPM_BUILD_ROOT'|%dir |' \
+  | sed 's|'%{buildroot}'|%dir |' \
   > %{name}.files
 # Find JRE files.
-find $RPM_BUILD_ROOT%{_jvmdir}/%{jredir} -type f -o -type l \
+find %{buildroot}%{_jvmdir}/%{jredir} -type f -o -type l \
   | grep -v jre/lib/security \
   | grep -v IcedTeaPlugin.so \
-  | sed 's|'$RPM_BUILD_ROOT'||' \
+  | sed 's|'%{buildroot}'||' \
   >> %{name}.files
 # Find demo directories.
-find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
-  $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/sample -type d \
-  | sed 's|'$RPM_BUILD_ROOT'|%dir |' \
+find %{buildroot}%{_jvmdir}/%{sdkdir}/demo \
+  %{buildroot}%{_jvmdir}/%{sdkdir}/sample -type d \
+  | sed 's|'%{buildroot}'|%dir |' \
   > %{name}-demo.files
 
 # FIXME: remove SONAME entries from demo DSOs.  See
 # https://bugzilla.redhat.com/show_bug.cgi?id=436497
 
 # Find non-documentation demo files.
-find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
-  $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/sample \
+find %{buildroot}%{_jvmdir}/%{sdkdir}/demo \
+  %{buildroot}%{_jvmdir}/%{sdkdir}/sample \
   -type f -o -type l | sort \
   | grep -v README \
-  | sed 's|'$RPM_BUILD_ROOT'||' \
+  | sed 's|'%{buildroot}'||' \
   >> %{name}-demo.files
 # Find documentation demo files.
-find $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/demo \
-  $RPM_BUILD_ROOT%{_jvmdir}/%{sdkdir}/sample \
+find %{buildroot}%{_jvmdir}/%{sdkdir}/demo \
+  %{buildroot}%{_jvmdir}/%{sdkdir}/sample \
   -type f -o -type l | sort \
   | grep README \
-  | sed 's|'$RPM_BUILD_ROOT'||' \
+  | sed 's|'%{buildroot}'||' \
   | sed 's|^|%doc |' \
   >> %{name}-demo.files
 
 cp -fa %{buildroot}%{_jvmdir}/%{jredir}/lib/fontconfig.properties{.src,}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 # FIXME: identical binaries are copied, not linked. This needs to be
 # fixed upstream.
