@@ -852,19 +852,9 @@ exit 0
 %dir %{_jvmdir}/%{sdkdir}/bin
 %dir %{_jvmdir}/%{sdkdir}/include
 %dir %{_jvmdir}/%{sdkdir}/lib
-%ifarch %{jit_arches}
-%if %{with_systemtap}
-%dir %{_jvmdir}/%{sdkdir}/tapset
-%endif
-%endif
 %{_jvmdir}/%{sdkdir}/bin/*
 %{_jvmdir}/%{sdkdir}/include/*
 %{_jvmdir}/%{sdkdir}/lib/*
-%ifarch %{jit_arches}
-%if %{with_systemtap}
-%{_jvmdir}/%{sdkdir}/tapset/*.stp
-%endif
-%endif
 %{_jvmdir}/%{sdklnk}
 %{_jvmjardir}/%{sdklnk}
 %{_datadir}/applications/*jconsole.desktop
