@@ -1,3 +1,9 @@
+%if %mdkversion >= 201200
+# rpmlint just sucks!!!
+%define _build_pkgcheck_set %{nil}
+%define _build_pkgcheck_srpm %{nil}
+%endif
+
 %if %mandriva_branch == Cooker
 %define with_systemtap		1
 %define release			%mkrel 25.%{openjdkver}
