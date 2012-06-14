@@ -148,9 +148,9 @@ Source3:	http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/generate-
 Source4:	README.src
 Source5:	mauve-%{mauvedate}.tar.gz
 Source6:	mauve_tests
-Source8:	http://icedtea.classpath.org/download/drops/jaxp144_01.zip
+Source8:	http://icedtea.classpath.org/download/drops/jaxp144_03.zip
 Source9:	http://icedtea.classpath.org/download/drops/jdk6-jaf-b20.zip
-Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws-b20.zip
+Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws2_1_6-2011_06_13.zip
 Patch1:		java-1.6.0-openjdk-accessible-toolkit.patch
 Patch2:		java-1.6.0-openjdk-fontpath.patch
 
