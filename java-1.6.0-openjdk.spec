@@ -18,10 +18,10 @@
 # java-1.6.0-openjdk-devel.
 %bcond_with			gcjbootstrap
 
-%define icedteaver		1.10.6
+%define icedteaver		1.11.3
 %define icedteasnapshot		%{nil}
-%define openjdkver		b22
-%define openjdkdate		28_feb_2011
+%define openjdkver		b24
+%define openjdkdate		14_nov_2011
 %define mauvedate		2008-10-22
 
 # cabral (fhimpe) we already use java-acess-bridge in Mandriva
@@ -140,26 +140,23 @@ Group:		Development/Java
 License:	GPLv2 with exceptions
 URL:		http://icedtea.classpath.org/
 Source0:	http://icedtea.classpath.org/download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
-# Fedora sources
-Source1:	openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
+# OpenJDK source from Fedora
+Source1:	http://pkgs.fedoraproject.org/repo/pkgs/java-1.6.0-openjdk/openjdk-6-src-b24-14_nov_2011-fedora.tar.gz/7ecb35d87da256e2d4510ce22f56a2bd/openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
 # (fhimpe) Disabled: we use system java-access-bridge in Mandriva
 #Source2:	%{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
 Source3:	http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/generate-fedora-zip.sh
 Source4:	README.src
 Source5:	mauve-%{mauvedate}.tar.gz
 Source6:	mauve_tests
-# hg f0f676c5a2c6
-Source7:	http://hg.openjdk.java.net/hsx/hsx20/master/archive/hotspot.tar.gz
 Source8:	http://icedtea.classpath.org/download/drops/jaxp144_01.zip
 Source9:	http://icedtea.classpath.org/download/drops/jdk6-jaf-b20.zip
 Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws-b20.zip
-Patch0:		makefile-xalan-deps.patch
 Patch1:		java-1.6.0-openjdk-accessible-toolkit.patch
 Patch2:		java-1.6.0-openjdk-fontpath.patch
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
-BuildRequires:	alsa-lib-devel
+BuildRequires:	pkgconfig(alsa)
 
 BuildRequires:	ant-nodeps
 BuildRequires:	cups-devel
@@ -375,8 +372,6 @@ perl -pi -e "s|libxul-unstable|libxul|g" configure*
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 
-patch -l -p0 < %{PATCH0}
-
 %{configure2_5x}					\
 	%{icedteaopt}					\
 	--with-openjdk-src-zip=%{SOURCE1}		\
@@ -386,8 +381,6 @@ patch -l -p0 < %{PATCH0}
 %else
 	--disable-pulse-java				\
 %endif
-	--with-hotspot-build=hs20			\
-	--with-hotspot-src-zip=%{SOURCE7}		\
 	--with-jaf-drop-zip=%{SOURCE9}			\
 	--with-jaxp-drop-zip=%{SOURCE8}			\
 	--with-jaxws-drop-zip=%{SOURCE10}		\
@@ -400,13 +393,18 @@ patch -l -p0 < %{PATCH0}
         --disable-docs                                  \
 %endif
 	--with-abs-install-dir=%{_jvmdir}/%{sdkdir}
+
+# When using a different hotspot (see hotspot.map):
+#	--with-hotspot-build=hs24			\
+#	--with-hotspot-src-zip=%{SOURCE7}		\
+
 %if %{with gcjbootstrap}
 make stamps/patch-ecj.stamp
 %endif
 
 make patch
-patch -l -p0 < %{PATCH1}
-patch -l -p1 < %{PATCH2}
+patch -l -p0 -b -z .p1~ < %{PATCH1}
+patch -l -p1 -b -z .p2~ < %{PATCH2}
 
 make STATIC_CXX=false
 
