@@ -1,0 +1,10 @@
+sources:
+  "generate-fedora-zip.sh:"	b5249220960eb54560ea810f5b4a55ecb6bfb28e
+  "icedtea6-1.11.3.tar.gz:"	29169d9e9a5403ae55dc40fd336859205f01d817
+  "jaxp144_03.zip:"	28c441ccaa2883e6308cff0cf8b51c893da25ff7
+  "jdk6-jaf-b20.zip:"	69a54373e169bd7b04a45de6a310a199260424b9
+  "jdk6-jaxws2_1_6-2011_06_13.zip:"	e5e86fd4be4c58f8820893437e5e95cff083e757
+  "mauve-2008-10-22.tar.gz:"	fa8c388e2beb24f5eaebe57677c9843ce6c39441
+  "mauve_tests:"	9292bbc82a4d077911983700a81ae0ac71ee6960
+  "openjdk-6-src-b24-14_nov_2011-fedora.tar.gz:"	4cdf7e63e1104abc2e995135da87c9252da6ee82
+  "README.src:"	8d60bcf2f842645b0a31f9efcd8330713491100e
