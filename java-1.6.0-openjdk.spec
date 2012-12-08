@@ -920,3 +920,802 @@ exit 0
 %defattr(-,root,root,-)
 %doc %{_javadocdir}/%{name}
 %endif
+
+
+%changelog
+* Thu Jun 14 2012 Bernhard Rosenkraenzer <bero@bero.eu> 0:1.6.0.0-26.b24mdv2012.0
++ Revision: 805735
+- Update to icedtea6 1.11.3, openjdk b24
+
+* Fri Feb 17 2012 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-26.b22
++ Revision: 775961
+- icedtea6-1.10.6
+
+* Sun Feb 12 2012 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-25.b22
++ Revision: 773464
+- disable rpmlint
+- fix rpm5 packaging issues
+- rebuild
+
+* Wed Nov 09 2011 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-24.b22
++ Revision: 729304
+- icedtea6-1.10.4
+
+  + Paulo Andrade <pcpa@mandriva.com.br>
+    - Convert gcjbootstrap define build option to rpmbuild command line option.
+
+* Sun Oct 02 2011 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-23.b22
++ Revision: 702448
+- duh, was in the midddle of dinner... automake, not aclocal
+- some moron removed th deps on aclocal somewhere (rpm-build?)
+- attempt to relink against libpng15.so.15
+
+  + Paulo Andrade <pcpa@mandriva.com.br>
+    - Provide java-javadoc when not generating documentation
+    - Correct check for build_docs macro in wrong scriptlet
+    - Customize to build on armv7l with an existing armv5te java-1.6.0-openjdk
+
+* Tue Jul 26 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-22.b22
++ Revision: 691677
+- Update to icedtea 1.10.3
+
+* Fri Jun 17 2011 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-21.b22
++ Revision: 685825
+- icedtea6 1.10.2
+
+* Thu Jun 16 2011 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-20.b22
++ Revision: 685495
+- use the same release for backports, makes it a lot easier
+
+* Wed Jun 15 2011 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-19.b22
++ Revision: 685412
+- fix deps (for backports/updates)
+- corrrect the backport/updates release string
+
+* Wed May 25 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-18.b22
++ Revision: 678905
+- Update to icedtea 1.10.1 and openjdk b22
+
+* Tue May 24 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-17.b20
++ Revision: 678015
+- Rework package to rebuild in cooker
+
+* Sun Mar 13 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-16.b20
++ Revision: 644445
+- Rebuild with systemtap support enabled
+
+  + Funda Wang <fwang@mandriva.org>
+    - rebuild to obsolete old packages
+
+* Wed Feb 16 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-14.b20
++ Revision: 638056
+- Update to openjdk b20 and icedtead 1.9.7
+  * Security updates
+  - S6878713, CVE-2010-4469: Hotspot backward jsr heap corruption
+  - S6907662, CVE-2010-4465: Swing timer-based security manager bypass
+  - S6994263, CVE-2010-4472: Untrusted code allowed to replace DSIG/C14N implemntation
+  - S6981922, CVE-2010-4448: DNS cache poisoning by untrusted applets
+  - S6983554, CVE-2010-4450: Launcher incorrect processing of empty library pathentries
+  - S6985453, CVE-2010-4471: Java2D font-related system property leak
+  - S6927050, CVE-2010-4470: JAXP untrusted component state manipulation
+  - RH677332, CVE-2011-0706: Multiple signers privilege escalation
+  * Bug fixes
+  - RH676659: Pass -export-dynamic flag to linker using -Wl, as option in gcc 4.6+is broken
+  - Fix latent JAXP bug caused by missing import
+- Update to icedtea 1.8.6 with security updates:
+ * RH672262, CVE-2011-0025: IcedTea jarfile signature verification bypass
+ * S4421494, CVE-2010-4476: infinite loop while parsing double literal
+
+* Tue Jan 18 2011 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-12.b18
++ Revision: 631635
+- * Security updates
+  - RH663680, CVE-2010-4351: IcedTea JNLP SecurityManager bypass
+  * Backports
+  - S6438179, RH569121: XToolkit.isTraySupported() result has nothing to do with the system tray
+  - S4356282: RFE: JDK should support OpenType/CFF fonts
+  - S6954424, RH525870: Support OpenType/CFF fonts in JDK 7
+  - S6795356, PR590: Leak caused by javax.swing.UIDefaults.ProxyLazyValue.acc
+  - S6967436, RH597227: lines longer than 2^15 can fill window.
+  - S6967433: dashed lines broken when using scaling transforms.
+  - S6976265: No STROKE_CONTROL
+  - S6967434, PR450, RH530642: Round joins/caps of scaled up lines have poor quality.
+  * Fixes:
+  - S7003777, RH647674: JTextPane produces incorrect content after parsing the html text
+
+* Wed Nov 24 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-11.b18mdv2011.0
++ Revision: 600880
+- Update to icedtea 1.8.3
+
+* Fri Oct 29 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-10.b18mdv2011.0
++ Revision: 590306
+- Correct a memory and a mutex leak
+- Update to icedtea 1.8.2
+
+* Thu Oct 14 2010 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-9.b18mdv2011.0
++ Revision: 585595
+- keep it backportable for security updates
+
+* Thu Sep 02 2010 Thierry Vignaud <tv@mandriva.org> 0:1.6.0.0-8.b18mdv2011.0
++ Revision: 575205
+- let the doc subpackage be noarch
+
+* Sat Jul 31 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-7.b18mdv2011.0
++ Revision: 563827
+- Update to icedtea 1.8.1.
+
+* Tue May 18 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-6.b18mdv2010.1
++ Revision: 545063
+- Don't explicitly link to xulrunner allowing chromium-browser to use openjdk
+
+* Fri May 07 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-5.b18mdv2010.1
++ Revision: 543083
++ rebuild (emptylog)
+
+* Mon Apr 26 2010 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-4.b18mdv2010.1
++ Revision: 538943
+- 2009.0 and up does not have xulrunner-devel-unstable
+- really prepare for main/testing
+- prepare for main/testing
+
+* Tue Apr 20 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-3.b18mdv2010.1
++ Revision: 537258
+- Correct an off by one misallocation that may cause random behavior
+
+* Fri Apr 16 2010 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-2.b18mdv2010.1
++ Revision: 535395
+- fix backport release as 2010.0 was named java-1.6.0-openjdk-1.6.0.0-0.20.b16.
+
+* Thu Apr 15 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-1.b18mdv2010.1
++ Revision: 535169
+- Restore generate-fedora-zip.sh to actually match fedora version
+- Update to icedtea6-1.8
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - added backporting magic for updates
+
+* Fri Feb 26 2010 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-0.20.b17.2mdv2010.1
++ Revision: 511884
+- fix borked deps (duh!)
+- rebuild
+
+* Tue Feb 09 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-0.20.b17.1mdv2010.1
++ Revision: 503395
+- Make systemtap support conditional, and default to disabled.
+- Update to icedtea 1.7 and openjdk b17
+
+* Mon Feb 01 2010 Funda Wang <fwang@mandriva.org> 0:1.6.0.0-0.20.b16.14mdv2010.1
++ Revision: 498972
+- merge mandriva-fontpath patch for CJK fonts, and fedora's own font patch
+
+* Tue Jan 19 2010 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-0.20.b16.13mdv2010.1
++ Revision: 493933
+- Patch plugin code to work with firefox 3.6.0
+
+  + Oden Eriksson <oeriksson@mandriva.com>
+    - fix libxul pkg-config discovery conditionally
+    - support libjpeg v8 too (conditionally)
+    - rebuilt against libjpeg v8
+
+  + Tomasz Pawel Gajc <tpg@mandriva.org>
+    - rebuild for new xulrunner (OJI interface has been obsoleted in xulrunner, NPAPI is standard now)
+
+* Fri Oct 30 2009 Paulo Andrade <pcpa@mandriva.com.br> 0:1.6.0.0-0.20.b16.11mdv2010.1
++ Revision: 460213
+- Correct installation of fontconfig.properties file (#55005)
+
+* Tue Oct 27 2009 Frederic Crozat <fcrozat@mandriva.com> 0:1.6.0.0-0.20.b16.10mdv2010.0
++ Revision: 459521
+- Force rebuild
+
+  + Paulo Andrade <pcpa@mandriva.com.br>
+    - Correct loop at 100%% cpu in ix86 when loading some java plugins in firefox.
+
+* Wed Oct 14 2009 Rafael da Veiga Cabral <cabral@mandriva.com> 0:1.6.0.0-0.20.b16.8mdv2010.0
++ Revision: 457302
+- removes Fedora changes required to link with their x11-proto-devel
+- add x11-proto-devel-header.patc (changes shmproto.h to XShm.h)
+- change version of x11-proto-devel buildrequire
+  (7.4 does not holds required headers)
+- add x11-proto-devel build require (shmproto.h)
+- update hotspot.tar.gz (fedora)
+- add java-1.6.0-openjdk-x11.patch
+- add new icedtea6-1.6
+- removed patches due the new icedtea:
+  java-1.6.0-openjdk-netxandplugin.patch
+  java-1.6.0-openjdk-securitypatches.patch
+  java-1.6.0-openjdk-no-ht-support.patch
+  java-1.6.0-openjdk-agent-allfiles.patch
+  java-1.6.0-openjdk-link-cpp.patch
+  icedtea-ignore-unrecognized-options.patch
+  icedtea-sparc-trapsfix.patch
+- rebzipping openjdk source without openjdk dir
+  (needed to build)
+- should solve both #53803 and #53809
+- some clean up on spec to keep it fedora like
+
+* Wed Oct 07 2009 Thierry Vignaud <tv@mandriva.org> 0:1.6.0.0-0.20.b16.7mdv2010.0
++ Revision: 455482
+- move huge changelog in devel package
+
+* Tue Sep 29 2009 Christophe Fergeau <cfergeau@mandriva.com> 0:1.6.0.0-0.20.b16.6mdv2010.0
++ Revision: 450806
+- use more accurate Requires (since we dlopen the lib name)
+- add explicit Requires: on libjpeg7 since it's dlopened
+- make sure we use libjpeg7 and not libjpeg62
+
+  + Nicolas Lécureuil <nlecureuil@mandriva.com>
+    - Rebuild for libjepg7
+
+* Mon Aug 24 2009 Tomasz Pawel Gajc <tpg@mandriva.org> 0:1.6.0.0-0.20.b16.4mdv2010.0
++ Revision: 420218
+- rebuild for new xulrunner
+
+* Sat Aug 15 2009 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-0.20.b16.3mdv2010.0
++ Revision: 416527
+- rebuilt against libjpeg v7
+
+* Fri Aug 14 2009 Rafael da Veiga Cabral <cabral@mandriva.com> 0:1.6.0.0-0.20.b16.2mdv2010.0
++ Revision: 416396
+- added java-1.6.0-openjdk-netxandplugin.patch and java-1.6.0-openjdk-securitypatches.patch to
+  fix security issues: (CVE-2009-0217, CVE-2009-2475, CVE-2009-2476, CVE-2009-2625, CVE-2009-2670,
+  CVE-2009-2671, CVE-2009-2673, CVE-2009-2674, CVE-2009-2675, CVE-2009-2689, CVE-2009-2690 and
+  CVE-2009-1896)
+
+* Tue Jun 09 2009 Rafael da Veiga Cabral <cabral@mandriva.com> 0:1.6.0.0-0.20.b16.1mdv2010.0
++ Revision: 384362
+- Build 16 embeddeds a new 1.18 lcms with security fixes for CVE-2009-0581,
+  CVE-2009-0723, CVE-2009-0733 and for CVE-2009-0793, so this release disable
+  java-1.6.0-openjdk-lcms.patch
+- java-1.6.0-openjdk-securitypatches.patch and java-1.6.0-openjdk-pulsejava.patch
+  were merged upstream and a further check was done to make sure fixes were there
+- java-1.6.0-openjdk-set-cookie-handling.patch were merged upstream
+- added a fixed icedtea-ignore-unrecognized-options.patch
+- icedtea-sparc-trapsfix.patch fixes icedtea-sparc-trapsfix.patch
+- fix-icedtea-shark-build.patch fixes icedtea-shark-build.patch
+- java-1.6.0-openjdk-link-cpp.patch rediffed
+- java-1.6.0-openjdk-sparc-fixes.patch rediffed
+- openjdk-6-src-b16-24_apr_2009-fedora.tar.gz source code was ripped from
+  fc 11 and changed to a bzip2 archive
+- According Joe Darcy from SUN the other non security bugs fixed in this build are:
+   - 6761791: Crash in the FontManager code due to use of JNIEnv saved by
+   another thread
+   - 6512707: "incompatible types" after (unrelated) annotation processing
+   - 6632696: Writing to closed output files (writeBytes) leaks native memory
+   (unix)
+   - 6788196: (porting) Bounds checks in io_util.c rely on undefined behaviour
+   - 6791458: FileInputStream/RandomAccessFile.read leaks memory if invoked
+   on closed stream with len > 8k
+   - 6792066: src/share/native/java/io/io_util.c clean-ups
+   - 6819886: System.getProperty("os.name") reports Vista on Windows 7
+   - 6821031: Upgrade OpenJDK's LittleCMS version to 1.18
+   - 6800572: Removing elements from views of NavigableMap implementations
+   does not always work correctly.
+   - 6801020: Concurrent Semaphore release may cause some require thread not
+   signaled
+   - 6806019: 38 JCK api/javax_sound/midi/ tests fails starting from jdk7 b46
+   - 6803402: Race condition in AbstractQueuedSynchronizer
+   - 6793757: Fix formatting of copyright notices in Gervill
+   - 6794201: remove unused sources
+   - 6808724: UninitializedDisplayModeChangeTest/DisplayModeChanger.java has
+   wrong legal notice
+   - 6821030: Merge OpenJDK Gervill with upstream sources, Q1CY2009
+   - 6823445: Gervill SoftChannel/ResetAllControllers jtreg test fails after
+   portamento fix from last merge
+   - 6823446: Gervill SoftLowFrequencyOscillator fails when freq is set to 0
+   cent or 8.1758 Hz.
+   - 6824976: Fix NAWK assignment in shell script
+   jdk/make/java/java/genlocales.gmk
+   - 6828183: testcase from SSR09_01 into jdk6-open hangs
+
+* Fri May 22 2009 Funda Wang <fwang@mandriva.org> 0:1.6.0.0-0.19.b14.4mdv2010.0
++ Revision: 378633
+- use our own CJK fonts path
+
+* Wed Apr 15 2009 Oden Eriksson <oeriksson@mandriva.com> 0:1.6.0.0-0.19.b14.3mdv2009.1
++ Revision: 367368
+- rebuild
+- make it backport to 2009.0
+
+* Tue Apr 14 2009 Tomasz Pawel Gajc <tpg@mandriva.org> 0:1.6.0.0-0.19.b14.2mdv2009.1
++ Revision: 366854
+- Patch105: prevents endlessly waiting for cookies (mdvbz #49908)
+
+* Sun Apr 12 2009 Frederik Himpe <fhimpe@mandriva.org> 0:1.6.0.0-0.19.b14.1mdv2009.1
++ Revision: 366452
+- Sync with Fedora's 1.6.0-19.b14:
+  * Add patches fixing security vulnerabilities in lcms (CVE-2009-0581,
+  CVE-2009-0723, CVE-2009-0733)  and pulseaudio output(CVE-2009-0794)
+  * Add OpenJDK patch fixing these security bugs according to Ubuntu
+    changelog:
+    - 6522586: Enforce limits on Font creation.
+    - 6536193: flaw in UTF8XmlOutput.
+    - 6610888: Potential use of cleared of incorrect acc in JMX Monitor.
+    - 6610896: JMX Monitor handles thread groups incorrectly.
+    - 6630639: lightweight HttpServer leaks file descriptors on no-data
+      connections.
+    - 6632886: Font.createFont can be persuaded to leak temporary files.
+    - 6636360: compiler/6595044/Main.java test fails with 64bit java on
+      solaris-sparcv9 with SIGSEGV.
+    - 6652463: MediaSize constructors allow to redefine the mapping of
+      standard MediaSizeName values.
+    - 6652929: Font.createFont(int,File) trusts File.getPath.
+    - 6656633: getNotificationInfo methods static mutable (findbugs).
+    - 6658158: Mutable statics in SAAJ (findbugs).
+    - 6658163: txw2.DatatypeWriter.BUILDIN is a mutable static (findbugs).
+    - 6691246: Thread context class loader can be set using JMX remote
+      ClientNotifForwarded.
+    - 6717680: LdapCtx does not close the connection if initialization fails.
+    - 6721651: Security problem with out-of-the-box management.
+    - 6737315: LDAP serialized data vulnerability.
+    - 6792554: Java JAR Pack200 header checks are insufficent.
+    - 6804996: JWS PNG Decoding Integer Overflow [V-flrhat2ln8].
+    - 6804997: JWS GIF Decoding Heap Corruption [V-r687oxuocp].
+    - 6804998: JRE GIF Decoding Heap Corruption [V-y6g5jlm8e1].
+  * Update icedtea from hg snapshot to release 1.4.1
+  * Update visualvm and netbeans profiler releases
+  * Update makefile patch to remove parts integrated upstream
+  * Add some archs supported by hotspot
+- Extract hotspot tarball by hand, because the configure script would not do
+  this because some other sources or patches already created the hotspot
+  directory
+- Renumber patches and sources to correspond with Fedora's numbering
+
+* Wed Dec 17 2008 David Walluck <walluck@mandriva.org> 0:1.6.0.0-0.18.b14.1mdv2009.1
++ Revision: 315308
+- rediff patches
+- add hotspot.tar.gz
+- b14
+
+* Sat Nov 15 2008 David Walluck <walluck@mandriva.org> 0:1.6.0.0-0.17.b13.1mdv2009.1
++ Revision: 303481
+- set pkgversion to include release info
+- make visualvm support optional
+- spec cleanup
+- fix Release
+- b13
+
+* Sun Aug 10 2008 David Walluck <walluck@mandriva.org> 0:1.6.0.0-0.16.b11.4mdv2009.0
++ Revision: 270163
+- install mozilla plugin into syslibdir
+
+  + Anssi Hannula <anssi@mandriva.org>
+    - restore lost cacerts changes (fixes broken cacerts symlink)
+
+* Thu Aug 07 2008 David Walluck <walluck@mandriva.org> 0:1.6.0.0-0.16.b11.1mdv2009.0
++ Revision: 266632
+- fix IcedTeaPlugin build requirements
+- fix Release
+- remove BuildRequires: firefox-devel
+- remove openjdk-do-not-redefine-bcopy-bcmp-bzero.patch as it is part of icedtea6 now
+- rediff icedtea6-1.2-policytool-desktop.patch
+- fix xulrunner-devel-unstable BuildRequires
+- update to b11
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - rebuild early 2009.0 package (before pixel changes)
+
+  + Per Øyvind Karlsen <peroyvind@mandriva.org>
+    - drop P8, static linking can be disabled with STATIC_CXX=false in stead..
+
+  + Nicolas Lécureuil <nlecureuil@mandriva.com>
+    - Do no show policytool on KDE menu
+
+  + Anssi Hannula <anssi@mandriva.org>
+    - icedtea6 1.2, with openjdk6 b09
+    - sync with fedora 1.6.0.0-0.16.b09
+    - add do-not-redefine-bcopy-bcmp-bzero.patch and link-cpp2.patch
+      (replacing $STATIC_CXX) to fix build issues
+    - drop now unneeded -fno-tre-vrp compiler flag
+    - drop now unneeded JAVACMD hacks
+    - set ALT_COMPILER_PATH="" to avoid calling /usr/bin/gcc explicitely
+      (for ccache et al)
+    - use rootcerts-java for cacerts file
+    - drop jhat.patch, fixed in icedtea6 patchset (also update
+      generate-dfsg-zip.sh accordingly and regenerate dfsg archive)
+
+  + Pixel <pixel@mandriva.com>
+    - rpm filetriggers deprecates update_menus/update_scrollkeeper/update_mime_database/update_icon_cache/update_desktop_database/post_install_gconf_schemas
+
+* Mon May 12 2008 Anssi Hannula <anssi@mandriva.org> 0:1.6.0.0-0.10.b09.2mdv2009.0
++ Revision: 206456
+- do not buildrequire mercurial, not used for build
+- obsolete java-1.7.0-icedtea for now, as development has shifted to
+  this package
+- add a comment regarding epoch 0
+- own mozilla plugin dir for alternatives
+- make the javaws desktop entry a bit better
+- call update_menus for -devel package as well
+- use macros for menus and icons
+- fix missing spaces in postun scripts
+- fix postun alternative checks for policy compliance
+
+* Fri May 09 2008 David Walluck <walluck@mandriva.org> 0:1.6.0.0-0.10.b09.1mdv2009.0
++ Revision: 204844
+- generate dfsg tarball (with sane permissions)
+- don't set vendor on menus
+- fix argument list too long
+- fix C++ linking
+- BuildRequires: zip
+- remove BuildRequires: X11-devel
+- import java-1.6.0-openjdk
+
+
+* Mon Apr 28 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.10.b09
+- Copied javaws.desktop and javaws.png to appropriate place.
+
+* Mon Apr 28 2008 Joshua Sumali <jsumali@redhat.com> - 1:1.6.0.0-0.10.b09
+- Added javaws menu entry.
+- Resolves: rhbz#443851
+
+* Mon Apr 28 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.10.b09
+- Updated release.
+- Updated icedteasnapshot.
+- Added jconsole and policy menu entries.
+- Removed all jhat references.
+- Resolves: rhbz#435235
+- Resolves: rhbz#417501
+- Resolves: rhbz#437418
+- Resolves: rhbz#443360
+- Resolves: rhbz#304031
+
+* Thu Apr 18 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.9.b09
+- Updated icedteaver.
+- Updated icedteasnapshot. 
+- Updated openjdkver.
+- Updated openjdkdate.
+- Updated release.
+- Resolves: rhbz#442602
+- Resolves: rhbz#442514
+- Resolves: rhbz#441437
+- Resolves: rhbz#375541
+
+* Thu Apr 17 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.9.b08
+- Added javaws to /usr/bin.
+- Resolves: rhbz#437929
+
+* Mon Apr 08 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.8.b08
+- Updated sources.
+- Updated icedteaver.
+
+* Mon Apr 07 2008 Dennis Gilmore <dennis@ausil.us> - 1:1.6.0.0-0.8.b08
+- enable building for all arches using zero where there is not a native port
+
+* Mon Mar 31 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.7.b08
+- Updated icedteasnapshot. Includes sources needed to build xmlgraphics-commons.
+- Updated release.
+- Resolves: rhbz#439676
+
+* Fri Mar 28 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.6.b08
+- Updated icedteasnapshot to fix ppc failure.
+
+* Thu Mar 27 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.6.b08
+- Removed iconv of THIRD_PARTY_README.
+
+* Thu Mar 27 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.6.b08
+- Updated icedteasnapshot.
+- Updated openjdkver and openjdkdate.
+- Removed java-1.6.0-openjdk-trademark.patch.
+- Updated generate-fedora-zip.sh.
+- Resolves: rhbz#438421
+
+* Thu Mar 20 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.5.b06
+- Updated icedteasnapshot.
+- Updated java-1.6.0-openjdk-optflags.patch.
+
+* Mon Mar 17 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.5.b06
+- Updated icedteasnapshot.
+- Updated Release.
+- Added new patch: java-1.6.0-openjdk-optflags.patch
+- Resolves: rhbz#437331
+
+* Mon Mar 17 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.5.b06
+- Added version for freetype-devel requirement.
+- Resolves: rhbz#437782
+
+* Fri Mar 14 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.4.b06
+- Fixed Provides and Obsoletes for all sub-packages. Should have specified
+java-1.7.0-icedtea < 1.7.0.0-0.999 instead of 1.7.0-0.999.
+- Resolves: rhbz#437492
+
+* Wed Mar 12 2008 Thomas Fitzsimmons <fitzsim@redhat.com> - 1:1.6.0.0-0.4.b06
+- Add FIXME about versionless SONAMEs.
+
+* Wed Mar 12 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.3.b06
+- Updated release.
+- Updated mauvedate to 2008-03-11.
+- Updated accessmajorver to 1.22.
+- Updated accessminorver to 0.
+
+* Tue Mar 11 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.2.b06
+- Updated snapshot.
+- Changed icedteaopt to use --with-openjdk instead of --with-icedtea.
+
+* Tue Mar 11 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.2.b06
+- Added Provides and Obsoletes for all subpackages. All sub-packages 
+replaces java-1.7.0-icedtea.
+- Updated Release.
+- Changed BuildRequires from java-1.7.0-icedtea to java-1.6.0-openjdk.
+- Added TRADEMARK file to docs.
+
+* Tue Mar 11 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.2.b06
+- Added Provides and Obsoletes. This package replaces java-1.7.0-icedtea.
+
+* Fri Feb 15 2008 Lillian Angel <langel@redhat.com> - 1:1.6.0.0-0.1.b06
+- Adapted for java-1.6.0-openjdk.
+
+* Wed Feb 13 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.25.b24
+- Added libffi requirement for ppc/64.
+
+* Wed Feb 13 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.25.b24
+- Updated icedteaver to 1.6.
+- Updated release.
+
+* Mon Feb 11 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.24.b24
+- Added libjpeg-6b as a requirement.
+- Resolves rhbz#432181
+
+* Mon Jan 28 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.24.b24
+- Kill Xvfb after it completes mauve tests.
+
+* Mon Jan 21 2008 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.24.b24
+- Remove cgibindir macro.
+- Remove icedtearelease.
+- Remove binfmt_misc support.
+- Remove .snapshot from changelog lines wider than 80 columns.
+
+* Tue Jan 08 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Added xorg-x11-fonts-misc as a build requirement for Mauve.
+- Updated mauve_tests.
+
+* Mon Jan 07 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Updated Mauve's build requirements.
+- Excluding Mauve tests that try to access the network.
+- Added Xvfb functionality to mauve tests to avoid display-related failures.
+- Resolves rhbz#427614
+
+* Thu Jan 03 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Added mercurial as a Build Requirement.
+- Fixed archbuild/archinstall if-block.
+
+* Thu Jan 03 2008 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Removed BuildRequirement firefox-devel
+- Added BuildRequirement gecko-devel
+- Resolves rhbz#427350
+
+* Fri Dec 28 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Updated icedtea source.
+- Resolves rhbz#426142
+
+* Thu Dec 13 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.23.b24.snapshot
+- Updated icedteaver.
+- Updated Release.
+- Updated buildoutputdir.
+- Removed openjdkdate.
+- Updated openjdkver.
+- Updated openjdkzip and fedorazip.
+- Added Requires: jpackage-utils.
+- Removed java-1.7.0-makefile.patch.
+- Updated patch list.
+- Resolves rhbz#411941
+- Resolves rhbz#399221
+- Resolves rhbz#318621
+
+* Thu Dec  6 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.22.b23
+- Clear bootstrap mode on ppc and ppc64.
+
+* Wed Dec  5 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.21.b23
+- Update icedteasnapshot.
+
+* Fri Nov 30 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.21.b23
+- Update icedteasnapshot.
+- Remove ExclusiveArch.
+- Assume i386.
+- Add support for ppc and ppc64.
+- Bootstrap on ppc and ppc64.
+
+* Thu Nov 15 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.20.b23
+- Add giflib-devel build requirement.
+
+* Thu Nov 15 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.20.b23
+- Add libjpeg-devel and libpng-devel build requirements.
+
+* Thu Nov 15 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.20.b23.snapshot
+- Added gcjbootstrap.
+- Updated openjdkver and openjdkdate to new b23 release.
+- Updated Release.
+- Added gcjbootstrap checks in.
+- Resolves: rhbz#333721
+
+* Mon Oct 15 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.19.b21.snapshot
+- Updated release.
+
+* Fri Oct 12 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.18.b21.snapshot
+- Updated release.
+
+* Fri Oct 12 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.17.b21.snapshot
+- Added jhat patch back in.
+
+* Thu Oct 11 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.17.b21.snapshot
+- Update icedtearelease.
+- Update icedteasnapshot.
+- Update openjdkver.
+- Update openjdkdate.
+- Updated genurl.
+- Removed unneeded patches.
+- Removed gcjbootstrap.
+- Removed icedteaopt.
+- Removed all gcj related checks.
+- Resolves: rhbz#317041 
+- Resolves: rhbz#314211 
+- Resolves: rhbz#314141 
+- Resolves: rhbz#301691
+
+* Mon Oct 1 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.16.b19.snapshot
+- Listed mauve_output as a doc file instead of a source.
+- Added mauve_tests to the src files as doc.
+
+* Fri Sep 28 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.16.b19.snapshot
+- Fixed testing. Output is stored in a file and passes/debug info is not shown.
+
+* Thu Sep 27 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.16.b19
+- Apply patch to use system tzdata.
+- Require tzdata-java.
+- Fix mauve shell fragment.
+
+* Thu Sep 27 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.15.b19.snapshot
+- Removed jtreg setup line.
+
+* Wed Sep 26 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.15.b19.snapshot
+- Removed jtreg.  Does not adhere to Fedora guidelines.
+
+* Tue Sep 25 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.15.b19.snapshot
+- Fixed running of Xvfb so it does not terminate after a successful
+  test.
+- Fixed mauve and jtreg test runs to not break the build when an error
+  is thrown
+
+* Mon Sep 24 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.15.b19.snapshot
+- Added JTreg zip as source
+- Run JTreg tests after build for smoke testing.
+- Added Xvfb as build requirement.
+
+* Wed Sep 12 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.15.b19.snapshot
+- Added Mauve tarball as source.
+- Added mauve_tests as source.
+- Run Mauve after build for regression testing.
+
+* Thu Sep  7 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.15.b18
+- Do not require openssl for build.
+- Require openssl.
+- Set gcjbootstrap to 0.
+- Remove generate-cacerts.pl.
+- Update icedtearelease.
+- Update icedteasnapshot.
+- Update openjdkver.
+- Update openjdkdate.
+
+* Wed Sep  5 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.15.b18
+- Rename javadoc master alternative javadocdir.
+- Resolves: rhbz#269901
+
+* Wed Sep  5 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.15.b18
+- Remove epoch in plugin provides.
+- Bump release number.
+- Resolves: rhbz#274001
+
+* Mon Aug 27 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.14.b18
+- Include idlj man page in files list.
+
+* Mon Aug 27 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.14.b18
+- Add documentation for plugin and src subpackages.
+- Fix plugin alternative on x86_64.
+- Add java-1.7.0-icedtea-win32.patch.
+- Rename modzip.sh generate-fedora-zip.sh.
+- Keep patches in main directory.
+- Namespace patches.
+- Add java-1.7.0-icedtea-win32.patch, README.plugin and README.src.
+- Bump release number.
+
+* Mon Aug 27 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.13.b18.snapshot
+- Added line to run modzip.sh to remove specific files from the openjdk zip.
+- Defined new openjdk zip created by modzip.sh as newopenjdkzip.
+- Added line to patch the IcedTea Makefile. No need to download openjdk zip.
+- Updated genurl.
+- Updated icedteasnapshot.
+
+* Fri Aug 24 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.13.b18
+- Remove RMI CGI script and subpackage.
+- Fix Java Access Bridge for GNOME URL.
+
+* Thu Aug 23 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.12.b18
+- Fully qualify Java Access Bridge for GNOME and generate-cacerts
+  source paths.
+- Fix plugin post alternatives invocation.
+- Include IcedTea documentation.
+- Update icedteasnapshot.
+
+* Tue Aug 21 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.11.b18
+- Revert change to configure macro.
+
+* Mon Aug 20 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.11.b18
+- Fix rpmlint errors.
+
+* Mon Aug 20 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.11.b18
+- Add missing development alternatives.
+- Bump accessver to 1.19.2.
+- Bump icedteaver.
+- Set icedteasnapshot.
+- Define icedtearelease.
+- Bump openjdkver.
+- Bump openjdkdate.
+- Bump release number.
+- Add plugin build requirements and subpackage.
+
+* Tue Jul 31 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.10.b16.1.2
+- Bump icedteaver.
+- Updated icedteasnapshot.
+- Updated release to include icedteaver.
+
+* Wed Jul 25 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.9.b16
+- Updated icedteasnapshot.
+- Bump openjdkver.
+- Bump openjdkdate.
+- Bump release number.
+
+* Wed Jul 18 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.8.b15
+- Only build rmi subpackage on non-x86_64 architectures.
+
+* Wed Jul 18 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.8.b15
+- Bump icedteaver.
+- Update icedteasnapshot.
+
+* Fri Jul 13 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.8.b15
+- Add rmi subpackage.
+- Remove name-version javadoc directory.
+
+* Fri Jul 13 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.8.b15
+- Set man extension to .gz in base and devel post sections.
+
+* Thu Jul 12 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.7.b15
+- Clear icedteasnapshot.
+- Bump release number.
+
+* Wed Jul 11 2007 Lillian Angel <langel@redhat.com> - 1.7.0.0-0.6.b15
+- Updated icedteasnapshot.
+- Bump openjdkver.
+- Bump openjdkdate.
+- Bump release number.
+
+* Thu Jul  5 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.5.b14
+- Define icedteasnapshot.
+
+* Wed Jul  4 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.4.b14
+- Prevent jar repacking.
+
+* Wed Jul  4 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.4.b14
+- Include generate-cacerts.pl.
+- Generate and install cacerts file.
+
+* Tue Jul  3 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.4.b14
+- Add javadoc subpackage.
+- Add Java Access Bridge for GNOME.
+- Add support for executable JAR files.
+- Bump alternatives priority to 17000.
+
+* Thu Jun 28 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.4.b14
+- Add support for executable jar files.
+- Bump icedteaver.
+- Bump openjdkver.
+- Bump openjdkdate.
+- Bump release number.
+
+* Tue Jun 19 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.3.b13
+- Import IcedTea 1.1.
+- Bump icedteaver.
+- Bump openjdkver.
+- Bump openjdkdate.
+- Bump release number.
+- Use --with-openjdk-src-zip.
+
+* Tue Jun 12 2007 Thomas Fitzsimmons <fitzsim@redhat.com> - 1.7.0.0-0.2.b12
+- Initial build.
