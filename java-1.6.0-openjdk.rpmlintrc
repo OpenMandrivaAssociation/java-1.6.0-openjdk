@@ -1,0 +1,5 @@
+# This is intentional because OpenJDK isn't really FHS compliant
+addFilter("E: binary-or-shlib-defines-rpath")
+# OpenJDK uses unversioned sonames - while we could fix this, that fix
+# would break binary compatibility with others -- so we won't
+addFilter("E: invalid-soname")

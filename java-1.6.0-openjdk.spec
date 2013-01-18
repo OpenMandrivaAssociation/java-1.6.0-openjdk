@@ -1,16 +1,12 @@
-%if %mdkversion >= 201200
-# rpmlint just sucks!!!
-%define _build_pkgcheck_set %{nil}
-%define _build_pkgcheck_srpm %{nil}
-%endif
+# Some parts of OpenJDK use -O0, which is mutually exclusive with
+# _FORTIFY_SOURCE
+%define _fortify_cflags %nil
 
 %if %mandriva_branch == Cooker
 %define with_systemtap		1
-%define release			%mkrel 26.%{openjdkver}
 %else
 %define with_systemtap		0
 %define subrel			1
-%define release			%mkrel 26.%{openjdkver}
 %endif
 
 # If gcjbootstrap is 1 IcedTea is bootstrapped against
@@ -18,7 +14,7 @@
 # java-1.6.0-openjdk-devel.
 %bcond_with			gcjbootstrap
 
-%define icedteaver		1.11.3
+%define icedteaver		1.11.5
 %define icedteasnapshot		%{nil}
 %define openjdkver		b24
 %define openjdkdate		14_nov_2011
@@ -122,7 +118,7 @@
 
 Name:		java-%{javaver}-%{origin}
 Version:	%{javaver}.%{buildver}
-Release:	%{release}
+Release:	27.%openjdkver
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -151,10 +147,9 @@ Source6:	mauve_tests
 Source8:	http://icedtea.classpath.org/download/drops/jaxp144_03.zip
 Source9:	http://icedtea.classpath.org/download/drops/jdk6-jaf-b20.zip
 Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws2_1_6-2011_06_13.zip
+Source100:	%name.rpmlintrc
 Patch1:		java-1.6.0-openjdk-accessible-toolkit.patch
 Patch2:		java-1.6.0-openjdk-fontpath.patch
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires:	pkgconfig(alsa)
 
@@ -169,7 +164,6 @@ BuildRequires:	lesstif-devel
 # BuildRequires: %{mklibname xorg-x11-devel}
 BuildRequires:	x11-proto-devel
 BuildRequires:	libxi-devel
-BuildRequires:	libxp-devel
 BuildRequires:	libxt-devel
 BuildRequires:	libxtst-devel
 BuildRequires:	jpeg-devel
@@ -194,12 +188,15 @@ BuildRequires:	systemtap
 BuildRequires:	java-1.5.0-gcj-devel
 %else
 BuildRequires:	java-1.6.0-openjdk-devel
+# We can't build with 1.7.0, but it tends to be the default
+# if both are installed
+BuildConflicts:	java-1.7.0-openjdk-devel
 %endif
 # Mauve build requirements.
 BuildRequires:	x11-server-xvfb
 BuildRequires:	x11-font-type1
 BuildRequires:	x11-font-misc
-BuildRequires:	freetype2-devel >= 2.3.0
+BuildRequires:	pkgconfig(freetype2)
 BuildRequires:	fontconfig
 BuildRequires:	eclipse-ecj
 # Java Access Bridge for GNOME build requirements.
