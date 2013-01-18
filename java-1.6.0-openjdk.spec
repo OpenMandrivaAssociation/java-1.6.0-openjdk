@@ -14,10 +14,10 @@
 # java-1.6.0-openjdk-devel.
 %bcond_with			gcjbootstrap
 
-%define icedteaver		1.11.5
-%define icedteasnapshot		%{nil}
-%define openjdkver		b24
-%define openjdkdate		14_nov_2011
+%define icedteaver		1.12
+%define icedteasnapshot		-20130118
+%define openjdkver		b27
+%define openjdkdate		26_oct_2012
 %define mauvedate		2008-10-22
 
 # cabral (fhimpe) we already use java-acess-bridge in Mandriva
@@ -136,20 +136,21 @@ Group:		Development/Java
 License:	GPLv2 with exceptions
 URL:		http://icedtea.classpath.org/
 Source0:	http://icedtea.classpath.org/download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
-# OpenJDK source from Fedora
-Source1:	http://pkgs.fedoraproject.org/repo/pkgs/java-1.6.0-openjdk/openjdk-6-src-b24-14_nov_2011-fedora.tar.gz/7ecb35d87da256e2d4510ce22f56a2bd/openjdk-6-src-%{openjdkver}-%{openjdkdate}-fedora.tar.gz
+# OpenJDK source with non-distributable bits removed, see generate-mdv-tarball.sh
+Source1:	openjdk-6-src-%{openjdkver}-%{openjdkdate}-mdv.tar.xz
 # (fhimpe) Disabled: we use system java-access-bridge in Mandriva
 #Source2:	%{accessurl}%{accessmajorver}/java-access-bridge-%{accessver}.tar.gz
-Source3:	http://cvs.fedoraproject.org/viewcvs/devel/java-1.6.0-openjdk/generate-fedora-zip.sh
+Source3:	generate-mdv-tarball.sh
 Source4:	README.src
 Source5:	mauve-%{mauvedate}.tar.gz
 Source6:	mauve_tests
-Source8:	http://icedtea.classpath.org/download/drops/jaxp144_03.zip
+Source8:	http://icedtea.classpath.org/download/drops/jaxp144_04.zip
 Source9:	http://icedtea.classpath.org/download/drops/jdk6-jaf-b20.zip
 Source10:	http://icedtea.classpath.org/download/drops/jdk6-jaxws2_1_6-2011_06_13.zip
 Source100:	%name.rpmlintrc
 Patch1:		java-1.6.0-openjdk-accessible-toolkit.patch
 Patch2:		java-1.6.0-openjdk-fontpath.patch
+Patch3:		icedtea6-no-libXp.patch
 
 BuildRequires:	pkgconfig(alsa)
 
@@ -204,11 +205,9 @@ Requires:	java-access-bridge
 %if %{without gcjbootstrap}
 BuildRequires:	java-access-bridge
 %endif
-%if %mdkversion >= 200910
 # PulseAudio build requirements.
 BuildRequires:	pulseaudio-devel >= 0.9.11
 BuildRequires:	pulseaudio >= 0.9.11
-%endif
 # Zero-assembler build requirement.
 %ifnarch %{jit_arches}
 BuildRequires:	libffi-devel
@@ -224,14 +223,6 @@ Requires:	tzdata-java
 Requires(post):	update-alternatives
 # Postun requires alternatives to uninstall tool alternatives.
 Requires(postun): update-alternatives
-%if %mdkversion < 200900
-# Post requires update-desktop-database to update desktop database
-# for jnlp files.
-Requires(post):	desktop-file-utils
-# Postun requires update-desktop-database to update desktop database
-# for jnlp files.
-Requires(postun): desktop-file-utils
-%endif
 # java-1.6.0-openjdk replaces java-1.7.0-icedtea.
 Provides:	java-1.7.0-icedtea = 0:1.7.0.0-24.726.2
 Obsoletes:	java-1.7.0-icedtea < 0:1.7.0.0-24.726.2
@@ -324,9 +315,7 @@ The OpenJDK source bundle.
 %package javadoc
 Summary: OpenJDK API Documentation
 Group:   Development/Java
-%if %mdkversion > 201100
 BuildArch: noarch
-%endif
 
 # Post requires alternatives to install javadoc alternative.
 Requires(post):   update-alternatives
@@ -351,6 +340,8 @@ The OpenJDK API documentation.
 cp %{SOURCE4} .
 cp %{SOURCE6} .
 
+%patch3 -p1 -b .libXp~
+
 # (oe) instead of a patch
 perl -pi -e "s|libxul-unstable|libxul|g" configure*
 
@@ -373,11 +364,7 @@ export ALT_COMPILER_PATH=
 	%{icedteaopt}					\
 	--with-openjdk-src-zip=%{SOURCE1}		\
 	--with-pkgversion=mandriva-%{release}-%{_arch}	\
-%if %mdkversion >= 200910
 	--enable-pulse-java				\
-%else
-	--disable-pulse-java				\
-%endif
 	--with-jaf-drop-zip=%{SOURCE9}			\
 	--with-jaxp-drop-zip=%{SOURCE8}			\
 	--with-jaxws-drop-zip=%{SOURCE10}		\
@@ -594,11 +581,13 @@ find %{buildroot}%{_jvmdir}/%{sdkdir}/demo \
 
 cp -fa %{buildroot}%{_jvmdir}/%{jredir}/lib/fontconfig.properties{.src,}
 
-%clean
-rm -rf %{buildroot}
+# Let's save a lot of space... And shut up rpmlint while at it!
+pushd %buildroot%_jvmdir
+for i in bin/* lib/*; do
+	[ -e jre/$i ] && [ "`sha1sum $i |cut -d' ' -f1`" = "`sha1sum jre/$i |cut -d' ' -f1`" ] && ln -f $i jre/$i
+done
+popd
 
-# FIXME: identical binaries are copied, not linked. This needs to be
-# fixed upstream.
 %post
 ext=%{_extension}
 update-alternatives\
@@ -644,13 +633,6 @@ update-alternatives\
   --slave %{_jvmjardir}/jre-%{javaver} \
   jre_%{javaver}_exports %{_jvmjardir}/%{jrelnk}
 
-# Update for jnlp handling.
-%if %mdkversion < 200900
-%update_desktop_database
-%update_icon_cache hicolor
-%update_menus
-%endif
-
 exit 0
 
 %postun
@@ -660,13 +642,6 @@ then
   update-alternatives --remove jre_%{origin} %{_jvmdir}/%{jrelnk}
   update-alternatives --remove jre_%{javaver} %{_jvmdir}/%{jrelnk}
 fi
-
-# Update for jnlp handling.
-%if %mdkversion < 200900
-%clean_desktop_database
-%clean_icon_cache hicolor
-%clean_menus
-%endif
 
 exit 0
 
@@ -772,9 +747,6 @@ update-alternatives\
   --slave %{_jvmjardir}/java-%{javaver} \
   java_sdk_%{javaver}_exports %{_jvmjardir}/%{sdklnk}
 
-%if %mdkversion < 200900
-%update_menus
-%endif
 exit 0
 
 %postun devel
@@ -785,9 +757,6 @@ then
   update-alternatives --remove java_sdk_%{javaver} %{_jvmdir}/%{sdklnk}
 fi
 
-%if %mdkversion < 200900
-%clean_menus
-%endif
 exit 0
 
 %if %{build_docs}
@@ -829,6 +798,7 @@ exit 0
 # FIXME: These should be replaced by symlinks into /etc.
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.policy
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security
+%config(noreplace) %{_jvmdir}/%{jredir}/lib/security/java.security.old
 %config(noreplace) %{_jvmdir}/%{jredir}/lib/security/nss.cfg
 %{_datadir}/icons/hicolor/*x*/apps/java.png
 %{_mandir}/man1/java-%{name}.1*

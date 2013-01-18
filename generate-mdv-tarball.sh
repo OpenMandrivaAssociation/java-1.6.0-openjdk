@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+# based on Fedora's generate-fedora-zip.sh
 
 # Untar openjdk source tarball.
 mkdir openjdk
@@ -81,7 +82,8 @@ rm -rf \
 
 # Create new tarball with new name.
 pushd openjdk > /dev/null
-  tar czf ../$(basename $1 .tar.gz)-fedora.tar.gz *
+  tar cf ../$(basename $1 .tar.gz)-mdv.tar *
+  xz -9e ../$(basename $1 .tar.gz)-mdv.tar
 popd > /dev/null
 
 # Remove old unzipped openjdk dir.
