@@ -2,6 +2,11 @@
 # _FORTIFY_SOURCE
 %define _fortify_cflags %nil
 
+%define with_systemtap	1
+%ifarch %arm %mips 
+%define with_systemtap 0
+%endif
+
 %if %mandriva_branch == Cooker
 %define with_systemtap		1
 %else
@@ -14,8 +19,8 @@
 # java-1.6.0-openjdk-devel.
 %bcond_with			gcjbootstrap
 
-%define icedteaver		1.12
-%define icedteasnapshot		-20130118
+%define icedteaver		1.12.2
+%define icedteasnapshot		%{nil}
 %define openjdkver		b27
 %define openjdkdate		26_oct_2012
 %define mauvedate		2008-10-22
@@ -118,7 +123,7 @@
 
 Name:		java-%{javaver}-%{origin}
 Version:	%{javaver}.%{buildver}
-Release:	27.%openjdkver
+Release:	28.%openjdkver
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -433,8 +438,6 @@ popd
 %endif
 
 %install
-rm -rf %{buildroot}
-
 pushd %{buildoutputdir}/j2sdk-image
 
   # Install main files.
