@@ -19,7 +19,7 @@
 # java-1.6.0-openjdk-devel.
 %bcond_with			gcjbootstrap
 
-%define icedteaver		1.12.2
+%define icedteaver		1.12.3
 %define icedteasnapshot		%{nil}
 %define openjdkver		b27
 %define openjdkdate		26_oct_2012
