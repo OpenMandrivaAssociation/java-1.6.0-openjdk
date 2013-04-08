@@ -321,7 +321,7 @@ The OpenJDK demos.
 Summary: OpenJDK Source Bundle
 Group:   Development/Java
 
-Requires: %{name} = %{epoch}:%{version}-%{release}
+Requires: %{name} >= %{epoch}:%{version}-%{release}
 
 # java-1.6.0-openjdk-src replaces java-1.7.0-icedtea-src.
 Provides: java-1.7.0-icedtea-src = 0:1.7.0.0-24.726.2
