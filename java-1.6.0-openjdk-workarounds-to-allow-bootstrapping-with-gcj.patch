@@ -1,0 +1,94 @@
+--- openjdk/jdk/src/share/classes/com/sun/net/httpserver/HttpsConfigurator.java.bero	2013-05-10 21:22:17.140298263 +0200
++++ openjdk/jdk/src/share/classes/com/sun/net/httpserver/HttpsConfigurator.java	2013-05-10 21:22:21.673241593 +0200
+@@ -109,6 +109,6 @@ public class HttpsConfigurator {
+     * @since 1.6
+     */
+     public void configure (HttpsParameters params) {
+-        params.setSSLParameters (getSSLContext().getDefaultSSLParameters());
++        //params.setSSLParameters (getSSLContext().getDefaultSSLParameters());
+     }
+ }
+--- openjdk/jdk/src/share/classes/sun/net/httpserver/SSLStreams.java.bero	2013-05-10 21:22:33.660091737 +0200
++++ openjdk/jdk/src/share/classes/sun/net/httpserver/SSLStreams.java	2013-05-10 21:22:49.817889737 +0200
+@@ -78,8 +78,8 @@ class SSLStreams {
+             Parameters params = new Parameters (cfg, addr);
+             cfg.configure (params);
+             SSLParameters sslParams = params.getSSLParameters();
+-            if (sslParams != null) {
+-                engine.setSSLParameters (sslParams);
++            if (false) {
++                //engine.setSSLParameters (sslParams);
+             } else {
+                 /* tiger compatibility */
+                 if (params.getCipherSuites() != null) {
+--- openjdk/jdk/src/share/classes/sun/security/provider/certpath/BasicChecker.java.bero	2013-05-10 21:16:20.048762521 +0200
++++ openjdk/jdk/src/share/classes/sun/security/provider/certpath/BasicChecker.java	2013-05-10 21:16:28.904651808 +0200
+@@ -80,7 +80,7 @@ class BasicChecker extends PKIXCertPathC
+             this.caName = anchor.getTrustedCert().getSubjectX500Principal();
+         } else {
+             this.trustedPubKey = anchor.getCAPublicKey();
+-            this.caName = anchor.getCA();
++            this.caName = null; //anchor.getCA();
+         }
+         this.testDate = testDate;
+         this.sigProvider = sigProvider;
+--- openjdk/jdk/src/share/classes/sun/security/provider/certpath/ForwardBuilder.java.bero	2013-05-10 21:14:02.023488075 +0200
++++ openjdk/jdk/src/share/classes/sun/security/provider/certpath/ForwardBuilder.java	2013-05-10 21:14:30.577131105 +0200
+@@ -93,7 +93,7 @@ class ForwardBuilder extends Builder {
+                 trustedCerts.add(trustedCert);
+                 trustedSubjectDNs.add(trustedCert.getSubjectX500Principal());
+             } else {
+-                trustedSubjectDNs.add(anchor.getCA());
++                trustedSubjectDNs.add(null/*anchor.getCA()*/);
+             }
+         }
+         comparator = new PKIXCertComparator(trustedSubjectDNs);
+@@ -823,7 +823,7 @@ class ForwardBuilder extends Builder {
+                 }
+             }
+ 
+-            X500Principal trustedCAName = anchor.getCA();
++            X500Principal trustedCAName = null; //anchor.getCA();
+ 
+             /* Check subject/issuer name chaining */
+             if (!trustedCAName.equals(cert.getIssuerX500Principal())) {
+--- openjdk/jdk/src/share/classes/sun/security/provider/certpath/ReverseState.java.bero	2013-05-10 21:08:27.643668398 +0200
++++ openjdk/jdk/src/share/classes/sun/security/provider/certpath/ReverseState.java	2013-05-10 21:08:42.224486113 +0200
+@@ -240,7 +240,7 @@ class ReverseState implements State {
+         if (trustedCert != null) {
+             updateState(trustedCert);
+         } else {
+-            X500Principal caName = anchor.getCA();
++            X500Principal caName = (X500Principal)null; //anchor.getCA();
+             updateState(anchor.getCAPublicKey(), caName);
+         }
+ 
+--- openjdk/jdk/src/share/classes/sun/security/provider/certpath/SunCertPathBuilder.java.bero	2013-05-10 21:05:23.708967898 +0200
++++ openjdk/jdk/src/share/classes/sun/security/provider/certpath/SunCertPathBuilder.java	2013-05-10 21:12:23.040725530 +0200
+@@ -488,8 +488,11 @@ public final class SunCertPathBuilder ex
+                                           " using buildParams public key: " +
+                                           rootKey.toString());
+                     }
+-                    TrustAnchor anchor = new TrustAnchor
+-                        (cert.getSubjectX500Principal(), rootKey, null);
++		    // Hack to make it compile with gcj... Won't work, but
++		    // that's fine because gcj is only used during
++		    // bootstrapping...
++                    TrustAnchor anchor = null;
++                    //    (cert.getSubjectX500Principal(), rootKey, null);
+                     basicChecker = new BasicChecker(anchor,
+                                            builder.date,
+                                            buildParams.getSigProvider(),
+--- openjdk/jdk/src/share/classes/sun/security/ssl/KeyManagerFactoryImpl.java.bero	2013-05-10 21:14:57.003800726 +0200
++++ openjdk/jdk/src/share/classes/sun/security/ssl/KeyManagerFactoryImpl.java	2013-05-10 21:15:06.768678649 +0200
+@@ -113,8 +113,8 @@ abstract class KeyManagerFactoryImpl ext
+                 throw new InvalidAlgorithmParameterException
+                     ("FIPS mode: KeyStoreBuilderParameters not supported");
+             }
+-            List<Builder> builders =
+-                ((KeyStoreBuilderParameters)params).getParameters();
++            List<Builder> builders = null;
++                //((KeyStoreBuilderParameters)params).getParameters();
+             keyManager = new X509KeyManagerImpl(builders);
+             isInitialized = true;
+         }
