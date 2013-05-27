@@ -134,7 +134,7 @@
 
 Name:		java-%{javaver}-%{origin}
 Version:	%{javaver}.%{buildver}
-Release:	31.%openjdkver
+Release:	32.%openjdkver
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -668,9 +668,9 @@ cat %name.files %{name}-demo.files |while read r; do
 	rm -rf %buildroot$r
 done
 rm -rf %buildroot%_jvmdir/%jrelnk
-rm -rf %buildroot%_jvmjardir/%jrelnk
+#rm -rf %buildroot%_jvmjardir/%jrelnk
 rm -rf %buildroot%_jvmprivdir
-rm -rf %buildroot%jvmjardir
+#rm -rf %buildroot%jvmjardir
 rm -rf %buildroot%_jvmdir/%jredir/lib/security
 rm -f %buildroot%_datadir/icons/hicolor/*x*/apps/java.png
 rm -rf %buildroot%_mandir/man1/{java,keytool,orbd,pack200,rmid,rmiregistry,servertool,tnameserv,unpack200}-%name.1*
@@ -891,9 +891,7 @@ exit 0
 %doc README
 %dir %{_jvmdir}/%{sdkdir}
 %{_jvmdir}/%{jrelnk}
-%{_jvmjardir}/%{jrelnk}
 %{_jvmprivdir}/*
-%{jvmjardir}
 %dir %{_jvmdir}/%{jredir}/lib/security
 %{_jvmdir}/%{jredir}/lib/security/cacerts
 # FIXME: These should be replaced by symlinks into /etc.
@@ -933,6 +931,8 @@ exit 0
 %{_jvmdir}/%{sdkdir}/lib/*
 %{_jvmdir}/%{sdklnk}
 %{_jvmjardir}/%{sdklnk}
+%{_jvmjardir}/%{jrelnk}
+%{jvmjardir}
 %if ! %{with jre}
 # Bits of the jre that are actually needed
 %{_jvmdir}/%{jredir}
