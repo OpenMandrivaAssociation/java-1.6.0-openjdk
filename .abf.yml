@@ -1,5 +1,3 @@
-removed_sources:
-  icedtea6-1.12.4.tar.gz: cab39e301b75fea232050568f0e3542ab7b69cc4
 sources:
   icedtea6-1.12.5.tar.gz: 0a442713e5ae891f88aa5c35eb584fbcdd5db65b
   jaxp144_04.zip: 49de76a471bb32e28532d7d44f4686d12238a1bb

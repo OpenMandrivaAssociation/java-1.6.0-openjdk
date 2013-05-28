@@ -661,7 +661,7 @@ cat %name.files %{name}-demo.files |while read r; do
 	if echo $r |grep -q "%dir"; then
 		continue
 	fi
-	if echo $r |grep -E '(\.so|jvm.cfg|\.jar|meta-index)'; then
+	if echo $r |grep -E '(\.so|jvm.cfg|\.jar|meta-index|jvm-exports)'; then
 		# These files are needed even by javac
 		continue
 	fi
