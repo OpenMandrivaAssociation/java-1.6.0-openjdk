@@ -180,17 +180,17 @@ BuildRequires:	fastjar
 BuildRequires:	ungif-devel
 BuildRequires:	lesstif-devel
 # BuildRequires: %{mklibname xorg-x11-devel}
-BuildRequires:	x11-proto-devel
-BuildRequires:	libxi-devel
-BuildRequires:	libxt-devel
-BuildRequires:	libxtst-devel
+BuildRequires:	pkgconfig(xproto)
+BuildRequires:	pkgconfig(xi)
+BuildRequires:	pkgconfig(xt)
+BuildRequires:	pkgconfig(xtst)
 BuildRequires:	jpeg-devel
-BuildRequires:	png-devel
+BuildRequires:	pkgconfig(libpng)
 BuildRequires:	xalan-j2
 BuildRequires:	xerces-j2
 BuildRequires:	ant
-BuildRequires:	libxinerama-devel
-BuildRequires:	libxrender-devel
+BuildRequires:	pkgconfig(xinerama)
+BuildRequires:	pkgconfig(xrender)
 BuildRequires:	rhino
 BuildRequires:	wget
 BuildRequires:	zip
