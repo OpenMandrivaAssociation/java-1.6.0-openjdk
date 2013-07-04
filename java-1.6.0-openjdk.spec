@@ -198,7 +198,7 @@ BuildRequires:	automake
 
 %ifarch %{jit_arches}
   %if %{with_systemtap}
-BuildRequires:	systemtap
+BuildRequires:	systemtap-devel
   %endif
 %endif
 
