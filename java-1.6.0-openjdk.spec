@@ -134,7 +134,7 @@
 
 Name:		java-%{javaver}-%{origin}
 Version:	%{javaver}.%{buildver}
-Release:	32.%openjdkver
+Release:	33.%openjdkver
 # java-1.5.0-ibm from jpackage.org set Epoch to 1 for unknown reasons,
 # and this change was brought into RHEL-4.  java-1.5.0-ibm packages
 # also included the epoch in their virtual provides.  This created a
@@ -681,6 +681,7 @@ rm -rf %buildroot%_jvmdir/%sdklnk/{demo,sample}
 for i in keytool orbd pack200 policytool rmid rmiregistry servertool tnameserv unpack200 java; do
 	ln -sf ../../jre-1.7.0/bin/$i %buildroot%sdkbindir/$i
 done
+ln -sf ../../../jre-1.7.0/lib/currency.data %buildroot%{_jvmdir}/%{jredir}/lib/
 # May want to do the same for jar jarsigner javadoc jinfo native2ascii appletviewer apt
 # But that would introduce a dependency on JDK 1.7 as opposed to JRE 1.7
 %endif
