@@ -391,6 +391,11 @@ export LD_LIBRARY_PATH=`pwd`/openjdk.build-ecj/j2sdk-image/jre/lib/*/jli
 # (Anssi 07/2008) do not hardcode /usr/bin, to allow using ccache et al:
 export ALT_COMPILER_PATH=
 
+# Debugging why ABF complains about missing Xtst even though we do
+# BuildRequires: pkgconfig(xtst)
+ls -l %_libdir/pkgconfig/xtst.pc
+pkg-config --print-errors --exists xtst
+
 %{configure2_5x}					\
 	%{icedteaopt}					\
 	--with-openjdk-src-zip=%{SOURCE1}		\
