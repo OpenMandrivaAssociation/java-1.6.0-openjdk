@@ -184,6 +184,7 @@ BuildRequires:	pkgconfig(xproto)
 BuildRequires:	pkgconfig(xi)
 BuildRequires:	pkgconfig(xt)
 BuildRequires:	pkgconfig(xtst)
+BuildRequires:	pkgconfig(xfixes)
 BuildRequires:	jpeg-devel
 BuildRequires:	pkgconfig(libpng)
 BuildRequires:	xalan-j2
@@ -393,7 +394,6 @@ export ALT_COMPILER_PATH=
 
 # Debugging why ABF complains about missing Xtst even though we do
 # BuildRequires: pkgconfig(xtst)
-ls -l %_libdir/pkgconfig/xtst.pc
 pkg-config --print-errors --exists xtst
 
 %{configure2_5x}					\
