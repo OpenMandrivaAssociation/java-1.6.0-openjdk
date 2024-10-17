@@ -150,7 +150,7 @@ Summary:	OpenJDK Runtime Environment
 Group:		Development/Java
 
 License:	GPLv2 with exceptions
-URL:		http://icedtea.classpath.org/
+URL:		https://icedtea.classpath.org/
 Source0:	http://icedtea.classpath.org/download/source/icedtea6-%{icedteaver}%{icedteasnapshot}.tar.gz
 # OpenJDK source with non-distributable bits removed, see generate-mdv-tarball.sh
 Source1:	openjdk-6-src-%{openjdkver}-%{openjdkdate}-mdv.tar.xz
